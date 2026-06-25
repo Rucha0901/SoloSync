@@ -16,6 +16,7 @@ import "./App.css";
 
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
 
   // Redirect authenticated users trying to access login/signup
@@ -35,14 +36,18 @@ export default function App() {
         element={
           <ProtectedRoute>
             <div className="app">
-              <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+              <Navbar
+                onMenuClick={() => setIsSidebarOpen(true)}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+              />
               <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
               <main className="app__content">
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/current-projects" element={<CurrentProjects />} />
-                  <Route path="/closed-projects" element={<ClosedProjects />} />
+                  <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
+                  <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
                   <Route path="/payments" element={<Payments />} />
                   <Route path="/invoices" element={<Invoices />} />
                   <Route path="/profile" element={<Profile />} />
