@@ -1,0 +1,212 @@
+.profile-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  animation: profileFadeIn 0.4s ease-out;
+  font-family: var(--font-sans);
+}
+
+@keyframes profileFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  box-shadow: 0 8px 30px var(--shadow-color);
+}
+
+.profile-card__header {
+  margin-bottom: 28px;
+}
+
+.profile-card__back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 16px;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.profile-card__back-btn:hover {
+  color: var(--accent);
+  transform: translateX(-2px);
+}
+
+.profile-card__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.profile-card__subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.profile-card__success-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+  animation: profileBannerSlideDown 0.3s ease-out;
+}
+
+@keyframes profileBannerSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-card__user-section {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 28px;
+}
+
+@media (max-width: 576px) {
+  .profile-card__user-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+}
+
+.profile-card__avatar-preview-container {
+  position: relative;
+  display: inline-flex;
+}
+
+.profile-card__avatar-preview {
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  padding: 4px;
+  background-color: var(--bg-primary);
+}
+
+.profile-card__avatar-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  background-color: var(--accent);
+  color: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 1.5px solid var(--bg-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profile-card__user-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.profile-card__detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-card__detail-label {
+  font-size: 0.775rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.profile-card__detail-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.profile-card__avatar-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-card__section-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.profile-card__section-subtitle {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  margin: 0 0 20px 0;
+}
+
+.profile-card__avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 16px;
+}
+
+.profile-card__avatar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background-color: var(--bg-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.profile-card__avatar-btn:hover {
+  transform: scale(1.06);
+  background-color: var(--bg-hover);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.profile-card__avatar-btn:active {
+  transform: scale(0.96);
+}
+
+.profile-card__avatar-btn--active {
+  border-color: var(--avatar-color);
+  background-color: var(--bg-hover);
+  box-shadow: 0 0 0 1px var(--avatar-color), 0 4px 16px rgba(0, 0, 0, 0.1);
+}

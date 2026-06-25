@@ -9,6 +9,7 @@ import Payments from "./pages/Payments";
 import Invoices from "./pages/Invoices";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import "./App.css";
@@ -44,6 +45,7 @@ export default function App() {
                   <Route path="/closed-projects" element={<ClosedProjects />} />
                   <Route path="/payments" element={<Payments />} />
                   <Route path="/invoices" element={<Invoices />} />
+                  <Route path="/profile" element={<Profile />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </main>

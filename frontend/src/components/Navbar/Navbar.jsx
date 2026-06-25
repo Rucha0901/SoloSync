@@ -1,8 +1,12 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import Avatar from "../Avatars/Avatars";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import "./Navbar.css";
 
 export default function Navbar({ onMenuClick }) {
+  const { user } = useAuth();
   const [isAIPopoverOpen, setIsAIPopoverOpen] = useState(false);
   const popoverRef = useRef(null);
 
@@ -174,6 +178,12 @@ export default function Navbar({ onMenuClick }) {
           </div>
         )}
       </div>
+
+      {user && (
+        <Link to="/profile" className="navbar__profile-link" aria-label="View profile">
+          <Avatar id={user.avatarId} size={32} className="navbar__profile-avatar" />
+        </Link>
+      )}
 
       <ThemeToggle />
     </header>

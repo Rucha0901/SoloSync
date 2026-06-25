@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Avatar from "../components/Avatars/Avatars";
 import "./Home.css";
 
 export default function Home() {
+  const { user } = useAuth();
   const stats = [
     { label: "Active Projects", value: "3", change: "+1 this week", path: "/current-projects", type: "success" },
     { label: "Pending Invoices", value: "2", change: "$2,400 outstanding", path: "/invoices", type: "warning" },
@@ -18,10 +21,19 @@ export default function Home() {
   return (
     <div className="home-dashboard">
       <header className="home-dashboard__header">
-        <h1 className="home-dashboard__title">Welcome to SoloSync</h1>
-        <p className="home-dashboard__subtitle">
-          Your personal command center. Track your work, invoices, and payments in one unified workspace.
-        </p>
+        <div className="home-dashboard__welcome">
+          {user && (
+            <Link to="/profile" className="home-dashboard__avatar-link" aria-label="View profile settings">
+              <Avatar id={user.avatarId} size={56} className="home-dashboard__welcome-avatar" />
+            </Link>
+          )}
+          <div>
+            <h1 className="home-dashboard__title">Welcome, {user ? user.username : "Freelancer"}</h1>
+            <p className="home-dashboard__subtitle">
+              Your personal command center. Track your work, invoices, and payments in one unified workspace.
+            </p>
+          </div>
+        </div>
       </header>
 
       <div className="home-dashboard__stats">

@@ -82,8 +82,19 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("solosync-session");
   };
 
+  const updateAvatar = (avatarId) => {
+    if (!user) return { success: false };
+    const updatedUser = { ...user, avatarId };
+    setUser(updatedUser);
+    localStorage.setItem("solosync-session", JSON.stringify(updatedUser));
+
+    const updatedUsers = users.map((u) => (u.id === user.id ? updatedUser : u));
+    saveUsers(updatedUsers);
+    return { success: true };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, users, isLoading, signup, login, logout }}>
+    <AuthContext.Provider value={{ user, users, isLoading, signup, login, logout, updateAvatar }}>
       {children}
     </AuthContext.Provider>
   );
