@@ -17,16 +17,20 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background-color: transparent;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
   color: var(--text-primary);
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .navbar__menu-button:hover {
   background-color: var(--bg-hover);
-  border-color: var(--border-color);
+  border-color: var(--text-secondary);
+}
+
+.navbar__menu-button:active {
+  transform: scale(0.95);
 }
 
 .navbar__menu-button:focus-visible {
@@ -57,10 +61,10 @@
   gap: 6px;
   height: 36px;
   padding: 0 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background-color: transparent;
-  color: var(--text-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   font-weight: 500;
   font-size: 0.875rem;
   transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
@@ -68,8 +72,7 @@
 
 .navbar__new-project-button:hover {
   background-color: var(--bg-hover);
-  border-color: var(--border-color);
-  color: var(--text-primary);
+  border-color: var(--text-secondary);
 }
 
 .navbar__new-project-button:active {
@@ -108,10 +111,10 @@
   gap: 6px;
   height: 36px;
   padding: 0 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background-color: transparent;
-  color: var(--text-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   font-weight: 500;
   font-size: 0.875rem;
   transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
@@ -120,8 +123,7 @@
 .navbar__ai-button:hover,
 .navbar__ai-button--active {
   background-color: var(--bg-hover);
-  border-color: var(--border-color);
-  color: var(--text-primary);
+  border-color: var(--text-secondary);
 }
 
 .navbar__ai-button:active {
@@ -129,7 +131,7 @@
 }
 
 .navbar__ai-button:focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
