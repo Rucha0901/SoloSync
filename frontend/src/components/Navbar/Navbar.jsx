@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Logo from "../Logo/Logo";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import "./Navbar.css";
 
@@ -92,9 +93,12 @@ export default function Navbar({ onMenuClick }) {
         </svg>
       </button>
 
-      <span className="navbar__brand">
-        Solo<span className="navbar__brand-accent">Sync</span>
-      </span>
+      <div className="navbar__brand-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Logo size={28} />
+        <span className="navbar__brand">
+          Solo<span className="navbar__brand-accent">Sync</span>
+        </span>
+      </div>
 
       <div className="navbar__spacer" />
 
