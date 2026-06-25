@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import Avatar from "../Avatars/Avatars";
 import "./Sidebar.css";
 
 const NAV_ITEMS = [
@@ -12,6 +14,7 @@ const NAV_ITEMS = [
 
 export default function Sidebar({ isOpen, onClose }) {
   const panelRef = useRef(null);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -82,6 +85,43 @@ export default function Sidebar({ isOpen, onClose }) {
             </li>
           ))}
         </ul>
+
+        {user && (
+          <div className="sidebar__profile">
+            <div className="sidebar__profile-user">
+              <Avatar id={user.avatarId} size={38} className="sidebar__profile-avatar" />
+              <div className="sidebar__profile-info">
+                <span className="sidebar__profile-username">{user.username}</span>
+                <span className="sidebar__profile-email">{user.email}</span>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="sidebar__logout-button"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to log out of SoloSync?")) {
+                  logout();
+                  onClose();
+                }
+              }}
+              aria-label="Log out"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+              </svg>
+              <span>Logout</span>
+            </button>
+          </div>
+        )}
       </nav>
     </>
   );
