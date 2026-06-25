@@ -179,13 +179,13 @@ export default function Navbar({ onMenuClick }) {
         )}
       </div>
 
+      <ThemeToggle />
+
       {user && (
         <Link to="/profile" className="navbar__profile-link" aria-label="View profile">
           <Avatar id={user.avatarId} size={32} className="navbar__profile-avatar" />
         </Link>
       )}
-
-      <ThemeToggle />
     </header>
   );
 }

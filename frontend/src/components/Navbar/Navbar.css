@@ -58,18 +58,18 @@
   height: 36px;
   padding: 0 12px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--accent);
-  background-color: var(--accent-soft);
-  color: var(--accent);
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.875rem;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .navbar__new-project-button:hover {
-  background-color: var(--accent);
-  color: var(--bg-secondary);
-  border-color: var(--accent-hover);
+  background-color: var(--bg-hover);
+  border-color: var(--border-color);
+  color: var(--text-primary);
 }
 
 .navbar__new-project-button:active {
@@ -109,32 +109,19 @@
   height: 36px;
   padding: 0 12px;
   border-radius: var(--radius-sm);
-  border: 1px solid #8b5cf6;
-  background-color: rgba(139, 92, 246, 0.08);
-  color: #8b5cf6;
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.875rem;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
-}
-
-:root[data-theme="dark"] .navbar__ai-button {
-  border-color: #a78bfa;
-  background-color: rgba(167, 139, 250, 0.12);
-  color: #c084fc;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .navbar__ai-button:hover,
 .navbar__ai-button--active {
-  background-color: #8b5cf6;
-  color: #ffffff;
-  border-color: #7c3aed;
-}
-
-:root[data-theme="dark"] .navbar__ai-button:hover,
-:root[data-theme="dark"] .navbar__ai-button--active {
-  background-color: #a78bfa;
-  color: #1c1b16;
-  border-color: #c084fc;
+  background-color: var(--bg-hover);
+  border-color: var(--border-color);
+  color: var(--text-primary);
 }
 
 .navbar__ai-button:active {
