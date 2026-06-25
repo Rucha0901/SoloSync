@@ -1,0 +1,53 @@
+.signup-card {
+  max-width: 480px;
+}
+
+.signup-card__avatar-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: -2px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.signup-card__avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.signup-card__avatar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 6px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background-color: var(--bg-primary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.signup-card__avatar-btn:hover {
+  transform: scale(1.06);
+  background-color: var(--bg-hover);
+}
+
+.signup-card__avatar-btn:active {
+  transform: scale(0.96);
+}
+
+.signup-card__avatar-btn--selected {
+  border-color: var(--avatar-color);
+  background-color: var(--bg-hover);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--avatar-color);
+}
+
+@media (max-width: 480px) {
+  .signup-card__avatar-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+}
