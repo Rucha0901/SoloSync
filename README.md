@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # FreelanceFlow
 
 An open-source dashboard for freelancers to organize and manage their work.
@@ -59,3 +60,7 @@ Runs on `http://localhost:5173` by default.
 
 Authentication, a database, payment processing, project management logic,
 and automation workflows are out of scope for this stage.
+=======
+# SoloSync
+A freelancer management dashboard that centralizes projects, payments, and invoices in one place. Built with React and Go, featuring a GitHub-inspired sidebar and automation to streamline freelance workflows.
+>>>>>>> fee16f8e0693a30770fa804c685d625c536ebaef
