@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
 const NAV_ITEMS = [
+  { label: "Home", path: "/" },
   { label: "Current Projects", path: "/current-projects" },
   { label: "Closed Projects", path: "/closed-projects" },
   { label: "Payments", path: "/payments" },
@@ -70,6 +71,7 @@ export default function Sidebar({ isOpen, onClose }) {
               <NavLink
                 to={item.path}
                 onClick={onClose}
+                end={item.path === "/"}
                 className={({ isActive }) =>
                   `sidebar__link ${isActive ? "sidebar__link--active" : ""}`
                 }

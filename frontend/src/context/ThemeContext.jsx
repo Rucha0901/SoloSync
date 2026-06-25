@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-const STORAGE_KEY = "freelanceflow-theme";
+const STORAGE_KEY = "solosync-theme";
 const ThemeContext = createContext(undefined);
 
 function getInitialTheme() {

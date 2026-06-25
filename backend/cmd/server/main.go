@@ -23,7 +23,7 @@ func main() {
 	r := router.New(emailHandler)
 
 	addr := ":" + cfg.ServerPort
-	log.Printf("FreelanceFlow backend listening on %s", addr)
+	log.Printf("SoloSync backend listening on %s", addr)
 
 	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatalf("server error: %v", err)

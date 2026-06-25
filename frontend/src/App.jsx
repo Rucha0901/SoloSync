@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
+import Home from "./pages/Home";
 import CurrentProjects from "./pages/CurrentProjects";
 import ClosedProjects from "./pages/ClosedProjects";
 import Payments from "./pages/Payments";
@@ -18,7 +19,7 @@ export default function App() {
 
       <main className="app__content">
         <Routes>
-          <Route path="/" element={<Navigate to="/current-projects" replace />} />
+          <Route path="/" element={<Home />} />
           <Route path="/current-projects" element={<CurrentProjects />} />
           <Route path="/closed-projects" element={<ClosedProjects />} />
           <Route path="/payments" element={<Payments />} />

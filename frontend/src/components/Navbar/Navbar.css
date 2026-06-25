@@ -49,3 +49,48 @@
 .navbar__spacer {
   flex: 1;
 }
+
+.navbar__new-project-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent);
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.navbar__new-project-button:hover {
+  background-color: var(--accent);
+  color: var(--bg-secondary);
+  border-color: var(--accent-hover);
+}
+
+.navbar__new-project-button:active {
+  transform: scale(0.98);
+}
+
+.navbar__new-project-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.navbar__new-project-button-icon {
+  flex-shrink: 0;
+}
+
+@media (max-width: 576px) {
+  .navbar__new-project-button-text {
+    display: none;
+  }
+  .navbar__new-project-button {
+    width: 36px;
+    padding: 0;
+  }
+}
