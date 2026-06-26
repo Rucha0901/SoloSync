@@ -3,6 +3,7 @@ package reminder
 import (
 	"context"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -17,6 +18,7 @@ type DailyJob struct {
 // Scheduler fires CheckAndSend once per day for every registered job.
 type Scheduler struct {
 	svc  *Service
+	mu   sync.RWMutex
 	jobs []DailyJob
 	stop chan struct{}
 }
@@ -30,6 +32,9 @@ func NewScheduler(svc *Service) *Scheduler {
 
 // Register adds or replaces the job for a given freelancer email.
 func (sc *Scheduler) Register(job DailyJob) {
+	sc.mu.Lock()
+	defer sc.mu.Unlock()
+
 	for i, j := range sc.jobs {
 		if j.FreelancerEmail == job.FreelancerEmail {
 			sc.jobs[i] = job
@@ -64,18 +69,33 @@ func (sc *Scheduler) Stop() {
 	close(sc.stop)
 }
 
+// RunJob immediately evaluates one freelancer's project snapshot.
+func (sc *Scheduler) RunJob(ctx context.Context, job DailyJob) []error {
+	return sc.svc.CheckAndSend(ctx, job.FreelancerEmail, job.Projects)
+}
+
 func (sc *Scheduler) run() {
-	if len(sc.jobs) == 0 {
+	jobs := sc.snapshotJobs()
+	if len(jobs) == 0 {
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	log.Printf("[reminder] running check for %d registered user(s)", len(sc.jobs))
-	for _, job := range sc.jobs {
+	log.Printf("[reminder] running check for %d registered user(s)", len(jobs))
+	for _, job := range jobs {
 		errs := sc.svc.CheckAndSend(ctx, job.FreelancerEmail, job.Projects)
 		for _, err := range errs {
 			log.Printf("[reminder] error sending for %s: %v", job.FreelancerEmail, err)
 		}
 	}
+}
+
+func (sc *Scheduler) snapshotJobs() []DailyJob {
+	sc.mu.RLock()
+	defer sc.mu.RUnlock()
+
+	jobs := make([]DailyJob, len(sc.jobs))
+	copy(jobs, sc.jobs)
+	return jobs
 }
