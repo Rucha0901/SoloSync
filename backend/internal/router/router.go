@@ -6,10 +6,17 @@ import (
 	"freelanceflow/internal/handlers"
 )
 
-func New(emailHandler *handlers.EmailHandler) http.Handler {
+func New(emailHandler *handlers.EmailHandler, reminderHandler *handlers.ReminderHandler) http.Handler {
 	mux := http.NewServeMux()
 
+	// Email routes
 	mux.HandleFunc("POST /api/email/send", emailHandler.SendEmail)
+
+	// Reminder routes
+	mux.HandleFunc("POST /api/reminders/register", reminderHandler.Register)
+	mux.HandleFunc("POST /api/reminders/trigger-now", reminderHandler.TriggerNow)
+
+	// Health
 	mux.HandleFunc("GET /api/health", healthCheck)
 
 	return withCORS(mux)
