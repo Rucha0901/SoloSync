@@ -6,9 +6,11 @@ import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import CurrentProjects from "./pages/CurrentProjects";
 import ClosedProjects from "./pages/ClosedProjects";
+import DeadlineSchedule from "./pages/DeadlineSchedule";
 import Payments from "./pages/Payments";
 import Invoices from "./pages/Invoices";
 import Login from "./pages/Login";
+import MeetSchedule from "./pages/MeetSchedule";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
@@ -53,6 +55,8 @@ export default function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
                   <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
+                  <Route path="/meet-schedule" element={<MeetSchedule />} />
+                  <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
                   <Route path="/payments" element={<Payments />} />
                   <Route path="/invoices" element={<Invoices />} />
                   <Route path="/profile" element={<Profile />} />

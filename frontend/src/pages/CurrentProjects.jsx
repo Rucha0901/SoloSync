@@ -1,42 +1,9 @@
-import { Link } from "react-router-dom";
+import { ACTIVE_PROJECTS } from "../services/scheduleService";
 import "./Projects.css";
 
 export default function CurrentProjects({ searchQuery = "" }) {
-  const projects = [
-    {
-      id: "proj-1",
-      name: "Acme Website Redesign",
-      client: "Acme Corp",
-      status: "In Progress",
-      statusType: "progress",
-      budget: "$4,500",
-      progress: 65,
-      dueDate: "July 15, 2026",
-    },
-    {
-      id: "proj-2",
-      name: "Mobile App API Integration",
-      client: "Stark Industries",
-      status: "In Progress",
-      statusType: "progress",
-      budget: "$6,200",
-      progress: 40,
-      dueDate: "July 30, 2026",
-    },
-    {
-      id: "proj-3",
-      name: "Brand Identity & Guidelines",
-      client: "Wayne Enterprises",
-      status: "In Review",
-      statusType: "review",
-      budget: "$2,800",
-      progress: 95,
-      dueDate: "June 28, 2026",
-    },
-  ];
-
   // Filter projects by name or client (case-insensitive)
-  const filteredProjects = projects.filter(
+  const filteredProjects = ACTIVE_PROJECTS.filter(
     (proj) =>
       proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       proj.client.toLowerCase().includes(searchQuery.toLowerCase())
@@ -91,7 +58,13 @@ export default function CurrentProjects({ searchQuery = "" }) {
 
               <div className="project-card__footer">
                 <span>Due Date</span>
-                <span>{proj.dueDate}</span>
+                <span>
+                  {new Date(`${proj.dueDate}T00:00`).toLocaleDateString([], {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
             </article>
           ))}
