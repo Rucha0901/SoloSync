@@ -1,39 +1,9 @@
-import { Link } from "react-router-dom";
+import React from "react";
+import { useProjects } from "../context/ProjectContext";
 import "./Projects.css";
 
 export default function CurrentProjects({ searchQuery = "" }) {
-  const projects = [
-    {
-      id: "proj-1",
-      name: "Acme Website Redesign",
-      client: "Acme Corp",
-      status: "In Progress",
-      statusType: "progress",
-      budget: "$4,500",
-      progress: 65,
-      dueDate: "July 15, 2026",
-    },
-    {
-      id: "proj-2",
-      name: "Mobile App API Integration",
-      client: "Stark Industries",
-      status: "In Progress",
-      statusType: "progress",
-      budget: "$6,200",
-      progress: 40,
-      dueDate: "July 30, 2026",
-    },
-    {
-      id: "proj-3",
-      name: "Brand Identity & Guidelines",
-      client: "Wayne Enterprises",
-      status: "In Review",
-      statusType: "review",
-      budget: "$2,800",
-      progress: 95,
-      dueDate: "June 28, 2026",
-    },
-  ];
+  const { projects } = useProjects();
 
   // Filter projects by name or client (case-insensitive)
   const filteredProjects = projects.filter(
@@ -64,7 +34,7 @@ export default function CurrentProjects({ searchQuery = "" }) {
                     {proj.client}
                   </span>
                 </div>
-                <span className={`project-card__badge project-card__badge--${proj.statusType}`}>
+                <span className={`project-card__badge project-card__badge--${proj.status.toLowerCase().replace(/\s+/g, '-')}`}>
                   {proj.status}
                 </span>
               </div>
@@ -72,12 +42,21 @@ export default function CurrentProjects({ searchQuery = "" }) {
               <div className="project-card__body">
                 <div className="project-card__budget-row">
                   <span className="project-card__budget-label">Budget</span>
-                  <span className="project-card__budget-value">{proj.budget}</span>
+                  <span className="project-card__budget-value">${proj.budget.toLocaleString()}</span>
                 </div>
+
+                {proj.advanceAccepted && (
+                  <div className="project-card__budget-row" style={{ marginTop: '0', fontSize: '0.85rem' }}>
+                    <span className="project-card__budget-label">Advance</span>
+                    <span className={proj.advanceReceivedAmount >= proj.advanceAmount ? 'text-success' : 'text-warning'}>
+                      ${proj.advanceReceivedAmount.toLocaleString()} / ${proj.advanceAmount.toLocaleString()}
+                    </span>
+                  </div>
+                )}
 
                 <div className="project-card__progress-container">
                   <div className="project-card__progress-header">
-                    <span>Progress</span>
+                    <span>Build Progress</span>
                     <span>{proj.progress}%</span>
                   </div>
                   <div className="project-card__progress-track">
@@ -106,10 +85,15 @@ export default function CurrentProjects({ searchQuery = "" }) {
           </div>
           <h2 className="projects-empty__title">No projects found</h2>
           <p className="projects-empty__description">
-            No active projects match "{searchQuery}". Try refining your search query.
+            No active projects match your current view.
           </p>
         </div>
       )}
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .text-success { color: var(--accent); font-weight: 600; }
+        .text-warning { color: #fbbf24; font-weight: 600; }
+      `}} />
     </div>
   );
 }
