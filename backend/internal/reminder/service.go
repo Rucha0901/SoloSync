@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"freelanceflow/internal/email"
@@ -22,16 +23,23 @@ var ReminderThresholds = []int{5, 3, 1}
 // Service evaluates due dates and dispatches reminder emails.
 type Service struct {
 	emailSvc email.Service
+	mu       sync.Mutex
+	sent     map[string]struct{}
+	now      func() time.Time
 }
 
 func NewService(emailSvc email.Service) *Service {
-	return &Service{emailSvc: emailSvc}
+	return &Service{
+		emailSvc: emailSvc,
+		sent:     make(map[string]struct{}),
+		now:      time.Now,
+	}
 }
 
 // CheckAndSend inspects each project, determines which thresholds are hit
 // relative to today, and sends a reminder email for each match.
 func (s *Service) CheckAndSend(ctx context.Context, freelancerEmail string, projects []Project) []error {
-	today := time.Now().UTC().Truncate(24 * time.Hour)
+	today := s.now().UTC().Truncate(24 * time.Hour)
 	var errs []error
 
 	for _, proj := range projects {
@@ -42,13 +50,45 @@ func (s *Service) CheckAndSend(ctx context.Context, freelancerEmail string, proj
 			continue
 		}
 
+		key := reminderKey(freelancerEmail, proj, daysLeft)
+		if s.wasSent(key) {
+			continue
+		}
+
 		msg := buildReminderEmail(freelancerEmail, proj, daysLeft)
 		if err := s.emailSvc.Send(ctx, msg); err != nil {
 			errs = append(errs, fmt.Errorf("reminder for %q: %w", proj.Name, err))
+			continue
 		}
+
+		s.markSent(key)
 	}
 
 	return errs
+}
+
+func reminderKey(email string, proj Project, daysLeft int) string {
+	return strings.Join([]string{
+		strings.ToLower(strings.TrimSpace(email)),
+		strings.ToLower(strings.TrimSpace(proj.Name)),
+		proj.DueDate.UTC().Format("2006-01-02"),
+		fmt.Sprintf("%d", daysLeft),
+	}, "|")
+}
+
+func (s *Service) wasSent(key string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	_, ok := s.sent[key]
+	return ok
+}
+
+func (s *Service) markSent(key string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.sent[key] = struct{}{}
 }
 
 func isThreshold(daysLeft int) bool {
