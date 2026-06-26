@@ -1,11 +1,32 @@
 import { useState, useRef, useEffect } from "react";
 import Logo from "../Logo/Logo";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import Avatar from "../Avatars/Avatars";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import "./Navbar.css";
 
-export default function Navbar({ onMenuClick }) {
+export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }) {
+  const { user } = useAuth();
   const [isAIPopoverOpen, setIsAIPopoverOpen] = useState(false);
   const popoverRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  // Focus search input when "/" is pressed
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (
+        e.key === "/" &&
+        document.activeElement.tagName !== "INPUT" &&
+        document.activeElement.tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -102,6 +123,46 @@ export default function Navbar({ onMenuClick }) {
 
       <div className="navbar__spacer" />
 
+      <div className="navbar__search-container">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="navbar__search-icon"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          ref={searchInputRef}
+          type="text"
+          className="navbar__search-input"
+          placeholder="Search projects..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          aria-label="Search projects by name"
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            className="navbar__search-clear"
+            onClick={() => onSearchChange("")}
+            aria-label="Clear search"
+          >
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        )}
+        <span className="navbar__search-shortcut">/</span>
+      </div>
+
       <button
         type="button"
         className="navbar__new-project-button"
@@ -180,6 +241,12 @@ export default function Navbar({ onMenuClick }) {
       </div>
 
       <ThemeToggle />
+
+      {user && (
+        <Link to="/profile" className="navbar__profile-link" aria-label="View profile">
+          <Avatar id={user.avatarId} size={32} className="navbar__profile-avatar" />
+        </Link>
+      )}
     </header>
   );
 }

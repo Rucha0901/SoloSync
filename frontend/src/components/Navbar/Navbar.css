@@ -17,16 +17,20 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background-color: transparent;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
   color: var(--text-primary);
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .navbar__menu-button:hover {
   background-color: var(--bg-hover);
-  border-color: var(--border-color);
+  border-color: var(--text-secondary);
+}
+
+.navbar__menu-button:active {
+  transform: scale(0.95);
 }
 
 .navbar__menu-button:focus-visible {
@@ -57,19 +61,18 @@
   gap: 6px;
   height: 36px;
   padding: 0 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--accent);
-  background-color: var(--accent-soft);
-  color: var(--accent);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   font-weight: 500;
   font-size: 0.875rem;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .navbar__new-project-button:hover {
-  background-color: var(--accent);
-  color: var(--bg-secondary);
-  border-color: var(--accent-hover);
+  background-color: var(--bg-hover);
+  border-color: var(--text-secondary);
 }
 
 .navbar__new-project-button:active {
@@ -108,33 +111,19 @@
   gap: 6px;
   height: 36px;
   padding: 0 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid #8b5cf6;
-  background-color: rgba(139, 92, 246, 0.08);
-  color: #8b5cf6;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   font-weight: 500;
   font-size: 0.875rem;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
-}
-
-:root[data-theme="dark"] .navbar__ai-button {
-  border-color: #a78bfa;
-  background-color: rgba(167, 139, 250, 0.12);
-  color: #c084fc;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .navbar__ai-button:hover,
 .navbar__ai-button--active {
-  background-color: #8b5cf6;
-  color: #ffffff;
-  border-color: #7c3aed;
-}
-
-:root[data-theme="dark"] .navbar__ai-button:hover,
-:root[data-theme="dark"] .navbar__ai-button--active {
-  background-color: #a78bfa;
-  color: #1c1b16;
-  border-color: #c084fc;
+  background-color: var(--bg-hover);
+  border-color: var(--text-secondary);
 }
 
 .navbar__ai-button:active {
@@ -142,7 +131,7 @@
 }
 
 .navbar__ai-button:focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -251,5 +240,140 @@
   .navbar__ai-popover {
     right: -48px;
     width: 260px;
+  }
+}
+
+/* Navbar Profile Link */
+.navbar__profile-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color);
+  padding: 2px;
+  background-color: var(--bg-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.navbar__profile-link:hover {
+  transform: scale(1.08);
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.navbar__profile-link:active {
+  transform: scale(0.96);
+}
+
+.navbar__profile-avatar {
+  border-radius: 50%;
+}
+
+/* Search Bar Styles */
+.navbar__search-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 240px;
+  height: 36px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), width var(--transition-fast);
+}
+
+.navbar__search-container:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  background-color: var(--bg-secondary);
+}
+
+.navbar__search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.navbar__search-input {
+  width: 100%;
+  height: 100%;
+  padding: 0 46px 0 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.navbar__search-input:focus {
+  outline: none;
+}
+
+.navbar__search-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.navbar__search-clear {
+  position: absolute;
+  right: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.navbar__search-clear:hover {
+  color: var(--text-primary);
+}
+
+.navbar__search-shortcut {
+  position: absolute;
+  right: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 1px 5px;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0.8;
+  transition: opacity var(--transition-fast);
+}
+
+.navbar__search-container:focus-within .navbar__search-shortcut {
+  opacity: 0; /* Hide shortcut badge when input is focused */
+}
+
+@media (max-width: 768px) {
+  .navbar__search-container {
+    width: 180px;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar__search-container {
+    width: 120px;
+  }
+  .navbar__search-shortcut {
+    display: none; /* Hide shortcut badge on mobile */
+  }
+  .navbar__search-input {
+    padding-right: 28px; /* Reduce right padding since shortcut is gone */
+  }
+  .navbar__search-clear {
+    right: 6px;
   }
 }
