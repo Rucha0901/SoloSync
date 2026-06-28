@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Logo from "../components/Logo/Logo";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatars/Avatars";
 import "./Home.css";
@@ -21,6 +22,13 @@ export default function Home() {
   return (
     <div className="home-dashboard">
       <header className="home-dashboard__header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+          <Logo size={40} />
+          <h1 className="home-dashboard__title" style={{ marginBottom: 0 }}>Welcome to SoloSync</h1>
+        </div>
+        <p className="home-dashboard__subtitle">
+          Your personal command center. Track your work, invoices, and payments in one unified workspace.
+        </p>
         <div className="home-dashboard__welcome">
           {user && (
             <Link to="/profile" className="home-dashboard__avatar-link" aria-label="View profile settings">

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Logo from "../Logo/Logo";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Avatar from "../Avatars/Avatars";
@@ -113,9 +114,12 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
         </svg>
       </button>
 
-      <span className="navbar__brand">
-        Solo<span className="navbar__brand-accent">Sync</span>
-      </span>
+      <div className="navbar__brand-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Logo size={28} />
+        <span className="navbar__brand">
+          Solo<span className="navbar__brand-accent">Sync</span>
+        </span>
+      </div>
 
       <div className="navbar__spacer" />
 

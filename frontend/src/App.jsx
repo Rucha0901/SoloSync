@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
+import { useState } from "react";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Home from "./pages/Home";
+import Landing from "./pages/Landing";
 import CurrentProjects from "./pages/CurrentProjects";
 import ClosedProjects from "./pages/ClosedProjects";
 import Payments from "./pages/Payments";
@@ -20,6 +23,7 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
+  const location = useLocation();
 
   // Register this user's projects with the backend reminder scheduler
   // whenever they log in (or the page is refreshed while logged in).
@@ -31,18 +35,21 @@ export default function App() {
 
   // Redirect authenticated users trying to access login/signup
   const PublicRoute = ({ children }) => {
-    return user ? <Navigate to="/" replace /> : children;
+    return user ? <Navigate to="/dashboard" replace /> : children;
   };
 
   return (
     <Routes>
+      {/* Landing Page */}
+      <Route path="/" element={<Landing />} />
+
       {/* Auth Routes */}
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
 
       {/* App Shell Routes (Protected) */}
       <Route
-        path="/*"
+        path="/dashboard/*"
         element={
           <ProtectedRoute>
             <div className="app">
@@ -63,12 +70,16 @@ export default function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/reminders" element={<Reminders />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </main>
             </div>
           </ProtectedRoute>
         }
       />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
