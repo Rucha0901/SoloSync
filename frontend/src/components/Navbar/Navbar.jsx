@@ -1,27 +1,17 @@
 import { useState, useRef, useEffect } from "react";
-import { CalendarClock, CalendarDays, ClipboardList, Clock, Plus, Timer, Video, X } from "lucide-react";
+import { CalendarClock, CalendarDays, ClipboardList, Clock, Plus, Video, X } from "lucide-react";
 import Logo from "../Logo/Logo";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Avatar from "../Avatars/Avatars";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
-import {
-  SCHEDULE_UPDATED_EVENT,
-  addMeeting,
-  formatDateLabel,
-  formatMeetingTime,
-  getMeetingDateTime,
-  getMeetings,
-  getUpcomingMeetings,
-} from "../../services/scheduleService";
+import { addMeeting } from "../../services/scheduleService";
 import "./Navbar.css";
 
 export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }) {
   const { user } = useAuth();
   const [isAIPopoverOpen, setIsAIPopoverOpen] = useState(false);
   const [isMeetModalOpen, setIsMeetModalOpen] = useState(false);
-  const [meetings, setMeetings] = useState(() => getMeetings());
-  const [now, setNow] = useState(() => new Date());
   const [meetForm, setMeetForm] = useState({
     projectName: "",
     date: "",
@@ -29,8 +19,6 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
   });
   const popoverRef = useRef(null);
   const searchInputRef = useRef(null);
-
-  const upcomingMeeting = getUpcomingMeetings(meetings)[0];
 
   // Focus search input when "/" is pressed
   useEffect(() => {
@@ -49,24 +37,6 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
   }, []);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    function refreshMeetings() {
-      setMeetings(getMeetings());
-    }
-
-    window.addEventListener(SCHEDULE_UPDATED_EVENT, refreshMeetings);
-    window.addEventListener("storage", refreshMeetings);
-    return () => {
-      window.removeEventListener(SCHEDULE_UPDATED_EVENT, refreshMeetings);
-      window.removeEventListener("storage", refreshMeetings);
-    };
-  }, []);
-
-  useEffect(() => {
     function handleClickOutside(event) {
       if (popoverRef.current && !popoverRef.current.contains(event.target)) {
         setIsAIPopoverOpen(false);
@@ -81,30 +51,6 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
     };
   }, [isAIPopoverOpen]);
 
-  const formatCountdown = (meeting) => {
-    if (!meeting) {
-      return "No meets scheduled";
-    }
-
-    const remainingMs = getMeetingDateTime(meeting) - now;
-    if (remainingMs <= 0) {
-      return "Starting now";
-    }
-
-    const totalMinutes = Math.floor(remainingMs / 60000);
-    const days = Math.floor(totalMinutes / 1440);
-    const hours = Math.floor((totalMinutes % 1440) / 60);
-    const minutes = totalMinutes % 60;
-
-    if (days > 0) {
-      return `${days}d ${hours}h ${minutes}m`;
-    }
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-    return `${minutes}m`;
-  };
-
   const handleMeetFormChange = (event) => {
     const { name, value } = event.target;
     setMeetForm((current) => ({ ...current, [name]: value }));
@@ -116,12 +62,11 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
       return;
     }
 
-    const nextMeetings = addMeeting({
+    addMeeting({
       projectName: meetForm.projectName.trim(),
       date: meetForm.date,
       time: meetForm.time,
     });
-    setMeetings(nextMeetings);
     setMeetForm({ projectName: "", date: "", time: "" });
     setIsMeetModalOpen(false);
   };
@@ -359,29 +304,9 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
       <ThemeToggle />
 
       {user && (
-        <div className="navbar__profile-area">
-          <Link to="/dashboard/profile" className="navbar__profile-link" aria-label="View profile">
-            <Avatar id={user.avatarId} size={32} className="navbar__profile-avatar" />
-          </Link>
-
-          <div className="navbar__next-meet-popover" aria-live="polite">
-            <div className="navbar__next-meet-heading">
-              <Timer size={14} />
-              <span>Next meet</span>
-            </div>
-            {upcomingMeeting ? (
-              <>
-                <strong className="navbar__next-meet-countdown">{formatCountdown(upcomingMeeting)}</strong>
-                <span className="navbar__next-meet-project">{upcomingMeeting.projectName}</span>
-                <span className="navbar__next-meet-meta">
-                  {formatDateLabel(getMeetingDateTime(upcomingMeeting))} at {formatMeetingTime(upcomingMeeting)}
-                </span>
-              </>
-            ) : (
-              <span className="navbar__next-meet-empty">No upcoming meets</span>
-            )}
-          </div>
-        </div>
+        <Link to="/dashboard/profile" className="navbar__profile-link" aria-label="View profile">
+          <Avatar id={user.avatarId} size={32} className="navbar__profile-avatar" />
+        </Link>
       )}
 
       {isMeetModalOpen && (
