@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
+import { useState } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
@@ -78,6 +80,21 @@ export default function App() {
                 </main>
                 <UpcomingMeetPanel />
               </div>
+              <main className="app__content">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
+                  <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
+                  <Route path="/meet-schedule" element={<MeetSchedule />} />
+                  <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
+                  <Route path="/payments" element={<Payments />} />
+                  <Route path="/invoices" element={<Invoices />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/reminders" element={<Reminders />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </main>
             </div>
           </ProtectedRoute>
         }
