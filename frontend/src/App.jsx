@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
-import { useState } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
@@ -9,7 +7,7 @@ import Landing from "./pages/Landing";
 import CurrentProjects from "./pages/CurrentProjects";
 import ClosedProjects from "./pages/ClosedProjects";
 import DeadlineSchedule from "./pages/DeadlineSchedule";
-import Payments from "./pages/Payments";
+import PaymentDashboard from "./pages/PaymentDashboard";
 import Invoices from "./pages/Invoices";
 import Login from "./pages/Login";
 import MeetSchedule from "./pages/MeetSchedule";
@@ -40,6 +38,21 @@ export default function App() {
     return user ? <Navigate to="/dashboard" replace /> : children;
   };
 
+  const renderAppShell = (children) => (
+    <ProtectedRoute>
+      <div className="app">
+        <Navbar
+          onMenuClick={() => setIsSidebarOpen(true)}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+        <main className="app__content">{children}</main>
+      </div>
+    </ProtectedRoute>
+  );
+
   return (
     <Routes>
       {/* Landing Page */}
@@ -48,38 +61,25 @@ export default function App() {
       {/* Auth Routes */}
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+      <Route path="/payments" element={renderAppShell(<PaymentDashboard />)} />
 
       {/* App Shell Routes (Protected) */}
       <Route
         path="/dashboard/*"
-        element={
-          <ProtectedRoute>
-            <div className="app">
-              <Navbar
-                onMenuClick={() => setIsSidebarOpen(true)}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-              />
-              <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-              <main className="app__content">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
-                  <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
-                  <Route path="/meet-schedule" element={<MeetSchedule />} />
-                  <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
-                  <Route path="/payments" element={<Payments />} />
-                  <Route path="/invoices" element={<Invoices />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/reminders" element={<Reminders />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                </Routes>
-              </main>
-            </div>
-          </ProtectedRoute>
-        }
+        element={renderAppShell(
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
+              <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
+              <Route path="/meet-schedule" element={<MeetSchedule />} />
+              <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
+              <Route path="/payments" element={<PaymentDashboard />} />
+              <Route path="/invoices" element={<Invoices />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/reminders" element={<Reminders />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+        )}
       />
 
       {/* Fallback */}
