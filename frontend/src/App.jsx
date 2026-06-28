@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
@@ -11,8 +13,10 @@ import Invoices from "./pages/Invoices";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import Reminders from "./pages/Reminders";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
+import { registerReminders, alreadyRegisteredThisSession } from "./services/ReminderService";
 import "./App.css";
 
 export default function App() {
@@ -20,6 +24,14 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
   const location = useLocation();
+
+  // Register this user's projects with the backend reminder scheduler
+  // whenever they log in (or the page is refreshed while logged in).
+  useEffect(() => {
+    if (user && !alreadyRegisteredThisSession()) {
+      registerReminders(user.email);
+    }
+  }, [user]);
 
   // Redirect authenticated users trying to access login/signup
   const PublicRoute = ({ children }) => {
@@ -56,6 +68,8 @@ export default function App() {
                   <Route path="/payments" element={<Payments />} />
                   <Route path="/invoices" element={<Invoices />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/reminders" element={<Reminders />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </main>
