@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, Clock, Video, ChevronLeft, ChevronRight, Sparkles, ExternalLink } from "lucide-react";
+import { Calendar, Clock, Video, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import {
   SCHEDULE_UPDATED_EVENT,
   getMeetings,
@@ -202,11 +202,7 @@ export default function UpcomingMeetPanel() {
                 </div>
               )}
             </div>
-
-            <Link to="/dashboard/meet-schedule" className="meet-panel__link">
-              <span>View Meet Schedule</span>
-              <ExternalLink size={14} />
-            </Link>
+            {/* Removed View Meet Schedule option */}
           </div>
         ) : (
           <div className="meet-panel__empty">
