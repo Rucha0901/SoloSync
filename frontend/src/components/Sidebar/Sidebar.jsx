@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: "Closed Projects", path: "/closed-projects" },
   { label: "Payments", path: "/payments" },
   { label: "Invoices", path: "/invoices" },
+  { label: "Reminders", path: "/reminders" },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
