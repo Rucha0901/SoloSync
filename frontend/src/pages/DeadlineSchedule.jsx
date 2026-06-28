@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Flag } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Flag, ArrowLeft } from "lucide-react";
 import { ACTIVE_PROJECTS, getMonthCells, isSameDate } from "../services/scheduleService";
 import "./Schedule.css";
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function DeadlineSchedule() {
+  const navigate = useNavigate();
   const today = new Date();
   const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
@@ -26,11 +28,21 @@ export default function DeadlineSchedule() {
   return (
     <div className="schedule-page">
       <header className="schedule-page__header">
-        <div>
-          <h1 className="schedule-page__title">Deadline Scheduling</h1>
-          <p className="schedule-page__subtitle">
-            See project due dates in a month-by-month planning calendar.
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <button
+            type="button"
+            className="schedule-page__back-btn"
+            onClick={() => navigate("/dashboard")}
+            aria-label="Back to Dashboard"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div>
+            <h1 className="schedule-page__title">Deadline Scheduling</h1>
+            <p className="schedule-page__subtitle">
+              See project due dates in a month-by-month planning calendar.
+            </p>
+          </div>
         </div>
         <div className="schedule-page__summary">
           <ClipboardList size={18} />

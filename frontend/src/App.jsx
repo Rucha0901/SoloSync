@@ -74,6 +74,7 @@ export default function App() {
                     <Route path="/payments" element={<Payments />} />
                     <Route path="/invoices" element={<Invoices />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/reminders" element={<Reminders />} />
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                   </Routes>
                 </main>
