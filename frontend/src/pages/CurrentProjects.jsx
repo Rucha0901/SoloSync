@@ -5,8 +5,12 @@ import "./Projects.css";
 export default function CurrentProjects({ searchQuery = "" }) {
   const { projects } = useProjects();
 
+import { ACTIVE_PROJECTS } from "../services/scheduleService";
+import "./Projects.css";
+
+export default function CurrentProjects({ searchQuery = "" }) {
   // Filter projects by name or client (case-insensitive)
-  const filteredProjects = projects.filter(
+  const filteredProjects = ACTIVE_PROJECTS.filter(
     (proj) =>
       proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       proj.client.toLowerCase().includes(searchQuery.toLowerCase())
@@ -70,7 +74,13 @@ export default function CurrentProjects({ searchQuery = "" }) {
 
               <div className="project-card__footer">
                 <span>Due Date</span>
-                <span>{proj.dueDate}</span>
+                <span>
+                  {new Date(`${proj.dueDate}T00:00`).toLocaleDateString([], {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
             </article>
           ))}

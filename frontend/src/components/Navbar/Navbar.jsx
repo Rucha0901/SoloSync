@@ -1,14 +1,22 @@
 import { useState, useRef, useEffect } from "react";
+import { CalendarClock, CalendarDays, ClipboardList, Clock, Plus, Video, X } from "lucide-react";
 import Logo from "../Logo/Logo";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Avatar from "../Avatars/Avatars";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
+import { addMeeting } from "../../services/scheduleService";
 import "./Navbar.css";
 
 export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }) {
   const { user } = useAuth();
   const [isAIPopoverOpen, setIsAIPopoverOpen] = useState(false);
+  const [isMeetModalOpen, setIsMeetModalOpen] = useState(false);
+  const [meetForm, setMeetForm] = useState({
+    projectName: "",
+    date: "",
+    time: "",
+  });
   const popoverRef = useRef(null);
   const searchInputRef = useRef(null);
 
@@ -42,6 +50,26 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isAIPopoverOpen]);
+
+  const handleMeetFormChange = (event) => {
+    const { name, value } = event.target;
+    setMeetForm((current) => ({ ...current, [name]: value }));
+  };
+
+  const handleAddMeet = (event) => {
+    event.preventDefault();
+    if (!meetForm.projectName.trim() || !meetForm.date || !meetForm.time) {
+      return;
+    }
+
+    addMeeting({
+      projectName: meetForm.projectName.trim(),
+      date: meetForm.date,
+      time: meetForm.time,
+    });
+    setMeetForm({ projectName: "", date: "", time: "" });
+    setIsMeetModalOpen(false);
+  };
 
   const aiTools = [
     {
@@ -163,6 +191,39 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
         <span className="navbar__search-shortcut">/</span>
       </div>
 
+      <div className="navbar__schedule-actions">
+        <button
+          type="button"
+          className="navbar__schedule-button navbar__schedule-button--primary"
+          onClick={() => setIsMeetModalOpen(true)}
+          aria-label="Add new meet in schedule"
+          title="Add new meet"
+        >
+          <Plus size={16} />
+          <span>Add Meet</span>
+        </button>
+
+        <Link
+          to="/dashboard/meet-schedule"
+          className="navbar__schedule-button"
+          aria-label="Open meet scheduling"
+          title="Meet scheduling"
+        >
+          <CalendarClock size={16} />
+          <span>Meet Schedule</span>
+        </Link>
+
+        <Link
+          to="/dashboard/deadline-schedule"
+          className="navbar__schedule-button"
+          aria-label="Open deadline scheduling"
+          title="Deadline scheduling"
+        >
+          <ClipboardList size={16} />
+          <span>Deadlines</span>
+        </Link>
+      </div>
+
       <button
         type="button"
         className="navbar__new-project-button"
@@ -243,9 +304,82 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
       <ThemeToggle />
 
       {user && (
-        <Link to="/profile" className="navbar__profile-link" aria-label="View profile">
+        <Link to="/dashboard/profile" className="navbar__profile-link" aria-label="View profile">
           <Avatar id={user.avatarId} size={32} className="navbar__profile-avatar" />
         </Link>
+      )}
+
+      {isMeetModalOpen && (
+        <div className="navbar__meet-modal-backdrop" role="presentation">
+          <section className="navbar__meet-modal" role="dialog" aria-modal="true" aria-labelledby="meet-modal-title">
+            <div className="navbar__meet-modal-header">
+              <div>
+                <h2 id="meet-modal-title">Add New Meet</h2>
+                <p>Schedule a project meeting with date and timing.</p>
+              </div>
+              <button
+                type="button"
+                className="navbar__meet-modal-close"
+                onClick={() => setIsMeetModalOpen(false)}
+                aria-label="Close add meet form"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form className="navbar__meet-form" onSubmit={handleAddMeet}>
+              <label className="navbar__meet-field">
+                <span>Project name</span>
+                <div className="navbar__meet-input-wrap">
+                  <Video size={16} />
+                  <input
+                    type="text"
+                    name="projectName"
+                    value={meetForm.projectName}
+                    onChange={handleMeetFormChange}
+                    placeholder="Enter project name"
+                    required
+                  />
+                </div>
+              </label>
+
+              <div className="navbar__meet-form-row">
+                <label className="navbar__meet-field">
+                  <span>Date</span>
+                  <div className="navbar__meet-input-wrap">
+                    <CalendarDays size={16} />
+                    <input
+                      type="date"
+                      name="date"
+                      value={meetForm.date}
+                      onChange={handleMeetFormChange}
+                      required
+                    />
+                  </div>
+                </label>
+
+                <label className="navbar__meet-field">
+                  <span>Meeting time</span>
+                  <div className="navbar__meet-input-wrap">
+                    <Clock size={16} />
+                    <input
+                      type="time"
+                      name="time"
+                      value={meetForm.time}
+                      onChange={handleMeetFormChange}
+                      required
+                    />
+                  </div>
+                </label>
+              </div>
+
+              <button type="submit" className="navbar__meet-submit">
+                <Plus size={16} />
+                Add Meet to Schedule
+              </button>
+            </form>
+          </section>
+        </div>
       )}
     </header>
   );

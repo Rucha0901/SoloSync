@@ -1,0 +1,282 @@
+/* ===================================================
+   Reminders Page — SoloSync
+   =================================================== */
+
+.reminders-page {
+  padding: 32px 40px;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Header ──────────────────────────────────────── */
+.reminders-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reminders-page__title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary, #f0f0f0);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.reminders-page__subtitle {
+  font-size: 14px;
+  color: var(--text-secondary, #9ca3af);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Card ────────────────────────────────────────── */
+.reminders-card {
+  background: var(--card-bg, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 14px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.reminders-card__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary, #f0f0f0);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reminders-card__note {
+  font-size: 13px;
+  color: var(--text-secondary, #9ca3af);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Timeline ────────────────────────────────────── */
+.reminders-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reminders-timeline__item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.2s;
+}
+
+.reminders-timeline__item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.reminders-timeline__badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--reminder-color, #4caf7d);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--reminder-color, #4caf7d) 15%, transparent);
+}
+
+.reminders-timeline__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reminders-timeline__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #f0f0f0);
+}
+
+.reminders-timeline__desc {
+  font-size: 13px;
+  color: var(--text-secondary, #9ca3af);
+}
+
+/* ── Project rows ────────────────────────────────── */
+.reminders-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reminders-project-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.reminders-project-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reminders-project-row__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #f0f0f0);
+}
+
+.reminders-project-row__client {
+  font-size: 12px;
+  color: var(--text-secondary, #9ca3af);
+}
+
+.reminders-project-row__due {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reminders-project-row__date {
+  font-size: 13px;
+  color: var(--text-secondary, #9ca3af);
+}
+
+.reminders-project-row__badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+
+.reminders-project-row__badge--ok {
+  background: rgba(76, 175, 125, 0.15);
+  color: #4caf7d;
+}
+
+.reminders-project-row__badge--close {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+}
+
+.reminders-project-row__badge--overdue {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* ── Trigger card ────────────────────────────────── */
+.reminders-card--trigger {
+  border-color: rgba(76, 175, 125, 0.2);
+}
+
+.reminders-trigger-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.reminders-trigger-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #2f6f4e, #4caf7d);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.reminders-trigger-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.reminders-trigger-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.reminders-trigger-btn--loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.reminders-trigger-btn__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Banners ─────────────────────────────────────── */
+.reminders-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.reminders-banner--success {
+  background: rgba(76, 175, 125, 0.12);
+  color: #4caf7d;
+  border: 1px solid rgba(76, 175, 125, 0.25);
+}
+
+.reminders-banner--error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+@media (max-width: 640px) {
+  .reminders-page {
+    padding: 20px 16px;
+  }
+
+  .reminders-trigger-body {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .reminders-trigger-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
