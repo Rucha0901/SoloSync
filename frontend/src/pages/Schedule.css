@@ -53,6 +53,32 @@
   white-space: nowrap;
 }
 
+.schedule-page__back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.schedule-page__back-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateX(-2px);
+}
+
+.schedule-page__back-btn:active {
+  transform: scale(0.96) translateX(-2px);
+}
+
 .schedule-calendar {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
