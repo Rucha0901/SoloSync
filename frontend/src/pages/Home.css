@@ -5,20 +5,6 @@
   animation: fadeIn 0.4s ease-out;
 }
 
-.home-dashboard__success {
-  position: sticky;
-  top: calc(var(--navbar-height) + 12px);
-  z-index: 20;
-  margin-bottom: 18px;
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-md);
-  background: var(--accent-soft);
-  color: var(--text-primary);
-  padding: 12px 14px;
-  font-weight: 600;
-  box-shadow: 0 10px 30px var(--shadow-color);
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;

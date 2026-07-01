@@ -3,15 +3,12 @@ import { Link } from "react-router-dom";
 import Logo from "../components/Logo/Logo";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatars/Avatars";
-import NewProjectModal from "../components/NewProjectModal/NewProjectModal";
-import { PROJECTS_UPDATED_EVENT, addProject, getProjects } from "../services/scheduleService";
+import { PROJECTS_UPDATED_EVENT, getProjects } from "../services/scheduleService";
 import "./Home.css";
 
-export default function Home() {
+export default function Home({ onNewProjectClick }) {
   const { user } = useAuth();
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [projects, setProjects] = useState(() => getProjects());
-  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const refreshProjects = () => setProjects(getProjects());
@@ -19,22 +16,6 @@ export default function Home() {
     window.addEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
     return () => window.removeEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
   }, []);
-
-  useEffect(() => {
-    if (!successMessage) {
-      return undefined;
-    }
-
-    const timeout = window.setTimeout(() => setSuccessMessage(""), 3500);
-    return () => window.clearTimeout(timeout);
-  }, [successMessage]);
-
-  const handleCreateProject = (project) => {
-    const createdProject = addProject(project);
-    setProjects(getProjects());
-    setIsProjectModalOpen(false);
-    setSuccessMessage(`${createdProject.name} was created successfully.`);
-  };
 
   const stats = [
     { label: "Active Projects", value: String(projects.length), change: "+1 this week", path: "/current-projects", type: "success" },
@@ -51,12 +32,6 @@ export default function Home() {
 
   return (
     <div className="home-dashboard">
-      {successMessage && (
-        <div className="home-dashboard__success" role="status">
-          {successMessage}
-        </div>
-      )}
-
       <header className="home-dashboard__header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
           <Logo size={40} />
@@ -118,7 +93,7 @@ export default function Home() {
           <h2 className="home-dashboard__section-title">Quick Actions</h2>
           <div className="home-dashboard__shortcuts-grid">
             <button
-              onClick={() => setIsProjectModalOpen(true)}
+              onClick={onNewProjectClick}
               className="home-dashboard__shortcut-btn home-dashboard__shortcut-btn--primary"
             >
               <span className="home-dashboard__shortcut-icon">+</span>
@@ -133,12 +108,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      <NewProjectModal
-        isOpen={isProjectModalOpen}
-        onClose={() => setIsProjectModalOpen(false)}
-        onCreate={handleCreateProject}
-      />
     </div>
   );
 }
