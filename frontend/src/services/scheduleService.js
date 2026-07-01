@@ -1,5 +1,7 @@
 export const SCHEDULE_STORAGE_KEY = "solosync-meet-schedules";
 export const SCHEDULE_UPDATED_EVENT = "solosync-schedules-updated";
+export const PROJECTS_STORAGE_KEY = "solosync-active-projects";
+export const PROJECTS_UPDATED_EVENT = "solosync-projects-updated";
 
 export const ACTIVE_PROJECTS = [
   {
@@ -33,6 +35,63 @@ export const ACTIVE_PROJECTS = [
     dueDate: "2026-06-28",
   },
 ];
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function seededProjects() {
+  return ACTIVE_PROJECTS.map((project) => ({ ...project }));
+}
+
+export function getProjects() {
+  if (typeof window === "undefined") {
+    return seededProjects();
+  }
+
+  try {
+    const stored = localStorage.getItem(PROJECTS_STORAGE_KEY);
+    if (!stored) {
+      const seeded = seededProjects();
+      localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+    return JSON.parse(stored);
+  } catch (error) {
+    console.error("Could not load projects:", error);
+    return seededProjects();
+  }
+}
+
+export function saveProjects(projects) {
+  localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
+  window.dispatchEvent(new CustomEvent(PROJECTS_UPDATED_EVENT));
+}
+
+export function addProject(project) {
+  const projects = getProjects();
+  const nextProject = {
+    id: crypto.randomUUID ? crypto.randomUUID() : `proj-${Date.now()}`,
+    name: project.name,
+    client: project.client,
+    clientEmail: project.clientEmail,
+    status: "In Progress",
+    statusType: "progress",
+    budget: formatCurrency(project.totalBudget),
+    totalBudget: project.totalBudget,
+    progress: 0,
+    dueDate: project.dueDate,
+    advance: project.advance,
+    createdAt: new Date().toISOString(),
+  };
+  const nextProjects = [nextProject, ...projects];
+  saveProjects(nextProjects);
+  return nextProject;
+}
 
 function toDateInputValue(date) {
   const year = date.getFullYear();

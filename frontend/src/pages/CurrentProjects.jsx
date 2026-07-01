@@ -1,9 +1,19 @@
-import { ACTIVE_PROJECTS } from "../services/scheduleService";
+import { useEffect, useState } from "react";
+import { PROJECTS_UPDATED_EVENT, getProjects } from "../services/scheduleService";
 import "./Projects.css";
 
 export default function CurrentProjects({ searchQuery = "" }) {
+  const [projects, setProjects] = useState(() => getProjects());
+
+  useEffect(() => {
+    const refreshProjects = () => setProjects(getProjects());
+
+    window.addEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+    return () => window.removeEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+  }, []);
+
   // Filter projects by name or client (case-insensitive)
-  const filteredProjects = ACTIVE_PROJECTS.filter(
+  const filteredProjects = projects.filter(
     (proj) =>
       proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       proj.client.toLowerCase().includes(searchQuery.toLowerCase())
