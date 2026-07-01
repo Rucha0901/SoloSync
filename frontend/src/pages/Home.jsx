@@ -1,34 +1,39 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo/Logo";
 import { useAuth } from "../context/AuthContext";
+import { useProjects } from "../context/ProjectContext";
 import Avatar from "../components/Avatars/Avatars";
+import NewProjectModal from "../components/Modals/NewProjectModal";
 import "./Home.css";
 
 export default function Home() {
   const { user } = useAuth();
+  const { projects } = useProjects();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const activeProjectsCount = projects.length;
+  const pendingPayments = projects.reduce((total, p) => total + (p.budget - p.totalPaid), 0);
+  const totalReceived = projects.reduce((total, p) => total + p.totalPaid, 0);
+
   const stats = [
-    { label: "Active Projects", value: "3", change: "+1 this week", path: "/current-projects", type: "success" },
-    { label: "Pending Invoices", value: "2", change: "$2,400 outstanding", path: "/invoices", type: "warning" },
-    { label: "Payments (MTD)", value: "$6,850", change: "+18% vs last month", path: "/payments", type: "info" },
-    { label: "Closed Projects", value: "14", change: "Completed this year", path: "/closed-projects", type: "neutral" },
+    { label: "Active Projects", value: activeProjectsCount.toString(), change: "+1 this week", path: "/current-projects", type: "success" },
+    { label: "Pipeline Value", value: `$${pendingPayments.toLocaleString()}`, change: "Target revenue", path: "/payments", type: "warning" },
+    { label: "Payments (Total)", value: `$${totalReceived.toLocaleString()}`, change: "Realized revenue", path: "/payments", type: "info" },
+    { label: "Payment Status", value: "Healthy", change: "Across all clients", path: "/payments", type: "neutral" },
   ];
 
-  const activities = [
-    { id: 1, type: "project", message: "Created project 'Acme Website Redesign'", time: "2 hours ago" },
-    { id: 2, type: "invoice", message: "Sent Invoice #INV-004 to Stark Industries", time: "1 day ago" },
-    { id: 3, type: "payment", message: "Received payment of $3,500 from Wayne Enterprises", time: "3 days ago" },
-  ];
+  const recentActivities = projects
+    .flatMap(p => [
+      { id: `create-${p.id}`, type: "project", message: `Started project '${p.name}'`, date: p.id.split('-')[1] },
+      ...p.payments.map(pay => ({ id: pay.id, type: "payment", message: `Received ${pay.type} for '${p.name}'`, date: pay.id.split('-')[1] }))
+    ])
+    .sort((a, b) => b.date - a.date)
+    .slice(0, 5);
 
   return (
     <div className="home-dashboard">
       <header className="home-dashboard__header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-          <Logo size={40} />
-          <h1 className="home-dashboard__title" style={{ marginBottom: 0 }}>Welcome to SoloSync</h1>
-        </div>
-        <p className="home-dashboard__subtitle">
-          Your personal command center. Track your work, invoices, and payments in one unified workspace.
-        </p>
         <div className="home-dashboard__welcome">
           {user && (
             <Link to="/profile" className="home-dashboard__avatar-link" aria-label="View profile settings">
@@ -36,9 +41,9 @@ export default function Home() {
             </Link>
           )}
           <div>
-            <h1 className="home-dashboard__title">Welcome, {user ? user.username : "Freelancer"}</h1>
+            <h1 className="home-dashboard__title" style={{ marginBottom: 4 }}>Welcome back, {user ? user.username : "Freelancer"}</h1>
             <p className="home-dashboard__subtitle">
-              Your personal command center. Track your work, invoices, and payments in one unified workspace.
+              Your command center is ready. You have {activeProjectsCount} active projects.
             </p>
           </div>
         </div>
@@ -60,21 +65,24 @@ export default function Home() {
 
       <div className="home-dashboard__content">
         <div className="home-dashboard__section">
-          <h2 className="home-dashboard__section-title">Recent Activity</h2>
+          <h2 className="home-dashboard__section-title">Global Activity</h2>
           <div className="home-dashboard__activity-list">
-            {activities.map((act) => (
-              <div key={act.id} className="home-dashboard__activity-item">
-                <div className={`home-dashboard__activity-icon home-dashboard__activity-icon--${act.type}`}>
-                  {act.type === "project" && "📁"}
-                  {act.type === "invoice" && "📄"}
-                  {act.type === "payment" && "💰"}
+            {recentActivities.length > 0 ? (
+              recentActivities.map((act) => (
+                <div key={act.id} className="home-dashboard__activity-item">
+                  <div className={`home-dashboard__activity-icon home-dashboard__activity-icon--${act.type}`}>
+                    {act.type === "project" && "📁"}
+                    {act.type === "payment" && "💰"}
+                  </div>
+                  <div className="home-dashboard__activity-details">
+                    <p className="home-dashboard__activity-message">{act.message}</p>
+                    <span className="home-dashboard__activity-time">Automated log</span>
+                  </div>
                 </div>
-                <div className="home-dashboard__activity-details">
-                  <p className="home-dashboard__activity-message">{act.message}</p>
-                  <span className="home-dashboard__activity-time">{act.time}</span>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No recent activity to show.</p>
+            )}
           </div>
         </div>
 
@@ -82,7 +90,7 @@ export default function Home() {
           <h2 className="home-dashboard__section-title">Quick Actions</h2>
           <div className="home-dashboard__shortcuts-grid">
             <button
-              onClick={() => alert("New project creation will be implemented in the next phase.")}
+              onClick={() => setIsModalOpen(true)}
               className="home-dashboard__shortcut-btn home-dashboard__shortcut-btn--primary"
             >
               <span className="home-dashboard__shortcut-icon">+</span>
@@ -92,11 +100,13 @@ export default function Home() {
               Create Invoice
             </Link>
             <Link to="/payments" className="home-dashboard__shortcut-btn">
-              View Payments
+              Manage Finances
             </Link>
           </div>
         </div>
       </div>
+
+      <NewProjectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
