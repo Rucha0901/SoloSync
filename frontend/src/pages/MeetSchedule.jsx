@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock, Video } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock, Video, ArrowLeft } from "lucide-react";
 import {
   SCHEDULE_UPDATED_EVENT,
   formatMeetingTime,
@@ -12,20 +13,21 @@ import "./Schedule.css";
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function MeetSchedule() {
+  const navigate = useNavigate();
   const today = new Date();
   const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [meetings, setMeetings] = useState(() => getMeetings());
 
   useEffect(() => {
-    function refreshMeetings() {
+    function refresh() {
       setMeetings(getMeetings());
     }
 
-    window.addEventListener(SCHEDULE_UPDATED_EVENT, refreshMeetings);
-    window.addEventListener("storage", refreshMeetings);
+    window.addEventListener(SCHEDULE_UPDATED_EVENT, refresh);
+    window.addEventListener("storage", refresh);
     return () => {
-      window.removeEventListener(SCHEDULE_UPDATED_EVENT, refreshMeetings);
-      window.removeEventListener("storage", refreshMeetings);
+      window.removeEventListener(SCHEDULE_UPDATED_EVENT, refresh);
+      window.removeEventListener("storage", refresh);
     };
   }, []);
 
@@ -46,11 +48,21 @@ export default function MeetSchedule() {
   return (
     <div className="schedule-page">
       <header className="schedule-page__header">
-        <div>
-          <h1 className="schedule-page__title">Meet Scheduling</h1>
-          <p className="schedule-page__subtitle">
-            Track client meetings by project, date, and time.
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <button
+            type="button"
+            className="schedule-page__back-btn"
+            onClick={() => navigate("/dashboard")}
+            aria-label="Back to Dashboard"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div>
+            <h1 className="schedule-page__title">Meet Scheduling</h1>
+            <p className="schedule-page__subtitle">
+              Track client meetings by project, date, and time.
+            </p>
+          </div>
         </div>
         <div className="schedule-page__summary">
           <Video size={18} />

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
+import UpcomingMeetPanel from "./components/UpcomingMeetPanel/UpcomingMeetPanel";
 import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import CurrentProjects from "./pages/CurrentProjects";
@@ -114,6 +115,51 @@ export default function App() {
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
         )}
+        element={
+          <ProtectedRoute>
+            <div className="app">
+              <Navbar
+                onMenuClick={() => setIsSidebarOpen(true)}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+              />
+              <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+              <div className="app__body">
+                <main className="app__content">
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
+                    <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
+                    <Route path="/meet-schedule" element={<MeetSchedule />} />
+                    <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
+                    <Route path="/payments" element={<Payments />} />
+                    <Route path="/invoices" element={<Invoices />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/reminders" element={<Reminders />} />
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  </Routes>
+                </main>
+                <UpcomingMeetPanel />
+              </div>
+              <main className="app__content">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
+                  <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
+                  <Route path="/meet-schedule" element={<MeetSchedule />} />
+                  <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
+                  <Route path="/payments" element={<Payments />} />
+                  <Route path="/invoices" element={<Invoices />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/reminders" element={<Reminders />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </main>
+            </div>
+          </ProtectedRoute>
+        }
       />
 
       {/* Fallback */}
