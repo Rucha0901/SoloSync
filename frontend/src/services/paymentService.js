@@ -76,6 +76,19 @@ export function savePaymentProjects(projects) {
   window.dispatchEvent(new CustomEvent(PAYMENT_UPDATED_EVENT));
 }
 
+export function markPaymentCompleted(projectId) {
+  const projects = getPaymentProjects();
+  const index = projects.findIndex((p) => p.id === projectId);
+  if (index !== -1) {
+    if (projects[index].paymentReceived) {
+      return;
+    }
+    projects[index].paymentReceived = true;
+    projects[index].paymentReceivedAt = new Date().toISOString().split("T")[0];
+    savePaymentProjects(projects);
+  }
+}
+
 export function calculatePaymentSummary(projects, now = new Date()) {
   return projects.reduce(
     (summary, project) => {
