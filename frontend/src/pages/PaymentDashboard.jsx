@@ -19,7 +19,7 @@ function formatCurrency(value) {
 }
 
 function getPaymentStatus(project) {
-  if (project.isCompleted && project.paymentReceived) {
+  if (project.paymentReceived) {
     return { label: "Paid", type: "paid" };
   }
 

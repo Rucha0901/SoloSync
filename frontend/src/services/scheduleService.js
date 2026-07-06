@@ -1,3 +1,5 @@
+import { getPaymentProjects, savePaymentProjects } from "./paymentService";
+
 export const SCHEDULE_STORAGE_KEY = "solosync-meet-schedules";
 export const SCHEDULE_UPDATED_EVENT = "solosync-schedules-updated";
 export const PROJECTS_STORAGE_KEY = "solosync-active-projects";
@@ -90,6 +92,76 @@ export function addProject(project) {
   };
   const nextProjects = [nextProject, ...projects];
   saveProjects(nextProjects);
+
+  try {
+    const paymentProjects = getPaymentProjects();
+    const hasAdvance = project.advance?.requested;
+    const advancePaidAmt = hasAdvance ? Number(project.advance.amount) || 0 : 0;
+    paymentProjects.push({
+      id: nextProject.id,
+      name: nextProject.name,
+      client: nextProject.client,
+      totalAmount: Number(nextProject.totalBudget) || 0,
+      advancePaid: advancePaidAmt,
+      advancePaidAt: hasAdvance ? new Date().toISOString().split("T")[0] : null,
+      isCompleted: false,
+      paymentReceived: false,
+      paymentReceivedAt: null,
+    });
+    savePaymentProjects(paymentProjects);
+  } catch (err) {
+    console.error("Could not sync added project to payment service:", err);
+  }
+
+  return nextProject;
+}
+
+export function markProjectCompleted(projectId) {
+  const projects = getProjects();
+  const index = projects.findIndex((p) => p.id === projectId);
+  if (index !== -1) {
+    if (projects[index].status === "Completed") {
+      return;
+    }
+    projects[index].status = "Completed";
+    projects[index].statusType = "completed";
+    projects[index].progress = 100;
+    projects[index].completedDate = new Date().toISOString().split("T")[0];
+    saveProjects(projects);
+  }
+
+  try {
+    const paymentProjects = getPaymentProjects();
+    const payIndex = paymentProjects.findIndex((p) => p.id === projectId);
+    if (payIndex !== -1) {
+      if (!paymentProjects[payIndex].isCompleted) {
+        paymentProjects[payIndex].isCompleted = true;
+        savePaymentProjects(paymentProjects);
+      }
+    } else {
+      const proj = projects[index];
+      if (proj) {
+        const total = proj.totalBudget || (proj.budget ? Number(proj.budget.replace(/[^0-9]/g, "")) : 0);
+        const advanceAmt = proj.advance?.amount || 0;
+        paymentProjects.push({
+          id: projectId,
+          name: proj.name,
+          client: proj.client,
+          totalAmount: total,
+          advancePaid: advanceAmt,
+          advancePaidAt: proj.advance?.requested ? new Date().toISOString().split("T")[0] : null,
+          isCompleted: true,
+          paymentReceived: false,
+          paymentReceivedAt: null,
+        });
+        savePaymentProjects(paymentProjects);
+      }
+    }
+  } catch (err) {
+    console.error("Could not sync project completion to payment service:", err);
+  }
+}
+
   return nextProject;
 }
 

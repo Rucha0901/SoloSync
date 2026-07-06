@@ -117,26 +117,54 @@
   color: var(--accent);
 }
 
+.project-card__badge--ongoing {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+:root[data-theme="dark"] .project-card__badge--ongoing {
+  background-color: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+}
+
+.project-card__badge--closed {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+:root[data-theme="dark"] .project-card__badge--closed {
+  background-color: rgba(52, 211, 153, 0.16);
+  color: #34d399;
+}
+
 .project-card__body {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.project-card__budget-row {
+.project-card__budget-row,
+.project-card__detail-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 16px;
   font-size: 0.85rem;
 }
 
-.project-card__budget-label {
+.project-card__budget-label,
+.project-card__detail-label {
   color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
-.project-card__budget-value {
+.project-card__budget-value,
+.project-card__detail-value {
   font-weight: 600;
   color: var(--text-primary);
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 /* Progress bar */
@@ -238,4 +266,27 @@
 .projects-empty__clear-btn:hover {
   background-color: var(--accent);
   color: var(--bg-secondary);
+}
+
+@media (max-width: 640px) {
+  .projects-page {
+    padding: 24px 16px;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-card {
+    padding: 18px;
+  }
+
+  .project-card__detail-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .project-card__detail-value {
+    text-align: left;
+  }
 }

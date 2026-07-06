@@ -1,46 +1,51 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { PROJECTS_UPDATED_EVENT, getProjects } from "../services/scheduleService";
 import "./Projects.css";
 
-export default function ClosedProjects({ searchQuery = "" }) {
-  const projects = [
-    {
-      id: "proj-101",
-      name: "E-Commerce Platform Redesign",
-      client: "Globex Corp",
-      status: "Completed",
-      statusType: "completed",
-      budget: "$12,500",
-      progress: 100,
-      completedDate: "May 12, 2026",
-    },
-    {
-      id: "proj-102",
-      name: "Security Audit & Hotfixes",
-      client: "Umbrella Corp",
-      status: "Completed",
-      statusType: "completed",
-      budget: "$3,800",
-      progress: 100,
-      completedDate: "April 25, 2026",
-    },
-    {
-      id: "proj-103",
-      name: "SEO Optimization Campaign",
-      client: "Initech",
-      status: "Completed",
-      statusType: "completed",
-      budget: "$1,500",
-      progress: 100,
-      completedDate: "March 10, 2026",
-    },
-  ];
+function isClosedProject(project) {
+  const status = `${project.status || ""} ${project.statusType || ""}`.toLowerCase();
+  return status.includes("closed") || status.includes("completed") || project.progress === 100;
+}
 
-  // Filter projects by name or client (case-insensitive)
-  const filteredProjects = projects.filter(
-    (proj) =>
-      proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      proj.client.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+function formatDate(value) {
+  if (!value) {
+    return "Not set";
+  }
+
+  return new Date(`${value}T00:00`).toLocaleDateString([], {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatCurrency(value, fallback) {
+  if (Number.isFinite(Number(value))) {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }).format(Number(value));
+  }
+
+  return fallback || "$0";
+}
+
+export default function ClosedProjects({ searchQuery = "" }) {
+  const [projects, setProjects] = useState(() => getProjects());
+
+  useEffect(() => {
+    const refreshProjects = () => setProjects(getProjects());
+
+    window.addEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+    return () => window.removeEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+  }, []);
+
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const filteredProjects = projects.filter((proj) => {
+    const searchable = `${proj.name || ""} ${proj.client || ""}`.toLowerCase();
+    return isClosedProject(proj) && searchable.includes(normalizedSearch);
+  });
 
   return (
     <div className="projects-page">
@@ -64,34 +69,23 @@ export default function ClosedProjects({ searchQuery = "" }) {
                     {proj.client}
                   </span>
                 </div>
-                <span className={`project-card__badge project-card__badge--${proj.statusType}`}>
-                  {proj.status}
+                <span className="project-card__badge project-card__badge--closed">
+                  Closed
                 </span>
               </div>
 
               <div className="project-card__body">
-                <div className="project-card__budget-row">
-                  <span className="project-card__budget-label">Revenue Earned</span>
-                  <span className="project-card__budget-value">{proj.budget}</span>
-                </div>
-
-                <div className="project-card__progress-container">
-                  <div className="project-card__progress-header">
-                    <span>Progress</span>
-                    <span>{proj.progress}%</span>
-                  </div>
-                  <div className="project-card__progress-track">
-                    <div
-                      className="project-card__progress-bar"
-                      style={{ width: `${proj.progress}%` }}
-                    />
-                  </div>
+                <div className="project-card__detail-row">
+                  <span className="project-card__detail-label">Total Budget</span>
+                  <span className="project-card__detail-value">
+                    {formatCurrency(proj.totalBudget, proj.budget)}
+                  </span>
                 </div>
               </div>
 
               <div className="project-card__footer">
-                <span>Completed On</span>
-                <span>{proj.completedDate}</span>
+                <span>Completion Date</span>
+                <span>{formatDate(proj.completedDate || proj.completionDate || proj.dueDate)}</span>
               </div>
             </article>
           ))}
@@ -106,7 +100,9 @@ export default function ClosedProjects({ searchQuery = "" }) {
           </div>
           <h2 className="projects-empty__title">No projects found</h2>
           <p className="projects-empty__description">
-            No completed projects match "{searchQuery}". Try refining your search query.
+            {searchQuery
+              ? `No closed projects match "${searchQuery}". Try refining your search query.`
+              : "Closed projects will appear here once projects are completed."}
           </p>
         </div>
       )}

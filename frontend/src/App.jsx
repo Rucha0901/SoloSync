@@ -95,6 +95,8 @@ export default function App() {
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
       <Route path="/payments" element={renderAppShell(<PaymentDashboard />)} />
+      <Route path="/current-projects" element={renderAppShell(<CurrentProjects searchQuery={searchQuery} />)} />
+      <Route path="/closed-projects" element={renderAppShell(<ClosedProjects searchQuery={searchQuery} />)} />
 
       {/* App Shell Routes (Protected) */}
       <Route
@@ -102,6 +104,14 @@ export default function App() {
         element={renderAppShell(
             <Routes>
               <Route path="/" element={<Home onNewProjectClick={() => setIsProjectModalOpen(true)} />} />
+              <Route path="current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
+              <Route path="closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
+              <Route path="meet-schedule" element={<MeetSchedule />} />
+              <Route path="deadline-schedule" element={<DeadlineSchedule />} />
+              <Route path="payments" element={<PaymentDashboard />} />
+              <Route path="invoices" element={<Invoices />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="reminders" element={<Reminders />} />
               <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
               <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
               <Route path="/meet-schedule" element={<MeetSchedule />} />
