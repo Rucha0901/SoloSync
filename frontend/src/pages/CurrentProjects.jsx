@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import { PROJECTS_UPDATED_EVENT, getProjects } from "../services/scheduleService";
+import React from "react";
+import { useProjects } from "../context/ProjectContext";
+import "./Projects.css";
+
+export default function CurrentProjects({ searchQuery = "" }) {
+  const { projects } = useProjects();
+
+import { ACTIVE_PROJECTS } from "../services/scheduleService";
 import "./Projects.css";
 
 export default function CurrentProjects({ searchQuery = "" }) {
@@ -41,7 +49,7 @@ export default function CurrentProjects({ searchQuery = "" }) {
                     {proj.client}
                   </span>
                 </div>
-                <span className={`project-card__badge project-card__badge--${proj.statusType}`}>
+                <span className={`project-card__badge project-card__badge--${proj.status.toLowerCase().replace(/\s+/g, '-')}`}>
                   {proj.status}
                 </span>
               </div>
@@ -49,12 +57,21 @@ export default function CurrentProjects({ searchQuery = "" }) {
               <div className="project-card__body">
                 <div className="project-card__budget-row">
                   <span className="project-card__budget-label">Budget</span>
-                  <span className="project-card__budget-value">{proj.budget}</span>
+                  <span className="project-card__budget-value">${proj.budget.toLocaleString()}</span>
                 </div>
+
+                {proj.advanceAccepted && (
+                  <div className="project-card__budget-row" style={{ marginTop: '0', fontSize: '0.85rem' }}>
+                    <span className="project-card__budget-label">Advance</span>
+                    <span className={proj.advanceReceivedAmount >= proj.advanceAmount ? 'text-success' : 'text-warning'}>
+                      ${proj.advanceReceivedAmount.toLocaleString()} / ${proj.advanceAmount.toLocaleString()}
+                    </span>
+                  </div>
+                )}
 
                 <div className="project-card__progress-container">
                   <div className="project-card__progress-header">
-                    <span>Progress</span>
+                    <span>Build Progress</span>
                     <span>{proj.progress}%</span>
                   </div>
                   <div className="project-card__progress-track">
@@ -89,10 +106,15 @@ export default function CurrentProjects({ searchQuery = "" }) {
           </div>
           <h2 className="projects-empty__title">No projects found</h2>
           <p className="projects-empty__description">
-            No active projects match "{searchQuery}". Try refining your search query.
+            No active projects match your current view.
           </p>
         </div>
       )}
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .text-success { color: var(--accent); font-weight: 600; }
+        .text-warning { color: #fbbf24; font-weight: 600; }
+      `}} />
     </div>
   );
 }
