@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { PROJECTS_UPDATED_EVENT, getProjects } from "../services/scheduleService";
 import ProjectDetailsModal from "../components/ProjectDetailsModal/ProjectDetailsModal";
+import { useEffect, useState } from "react";
+import { PROJECTS_UPDATED_EVENT, getProjects } from "../services/scheduleService";
+import React from "react";
+import { useProjects } from "../context/ProjectContext";
+import "./Projects.css";
+
+export default function CurrentProjects({ searchQuery = "" }) {
+  const { projects } = useProjects();
+
+import { ACTIVE_PROJECTS } from "../services/scheduleService";
 import "./Projects.css";
 
 function isClosedProject(project) {
@@ -79,6 +89,12 @@ export default function CurrentProjects({ searchQuery = "" }) {
     const searchable = `${proj.name || ""} ${proj.client || ""} ${proj.clientEmail || ""}`.toLowerCase();
     return !isClosedProject(proj) && searchable.includes(normalizedSearch);
   });
+  // Filter projects by name or client (case-insensitive)
+  const filteredProjects = projects.filter(
+    (proj) =>
+      proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      proj.client.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="projects-page">
@@ -109,6 +125,8 @@ export default function CurrentProjects({ searchQuery = "" }) {
                 </div>
                 <span className="project-card__badge project-card__badge--ongoing">
                   Ongoing
+                <span className={`project-card__badge project-card__badge--${proj.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {proj.status}
                 </span>
               </div>
 
@@ -126,6 +144,31 @@ export default function CurrentProjects({ searchQuery = "" }) {
                 <div className="project-card__detail-row">
                   <span className="project-card__detail-label">Advance Payment</span>
                   <span className="project-card__detail-value">{formatAdvance(proj.advance)}</span>
+                <div className="project-card__budget-row">
+                  <span className="project-card__budget-label">Budget</span>
+                  <span className="project-card__budget-value">${proj.budget.toLocaleString()}</span>
+                </div>
+
+                {proj.advanceAccepted && (
+                  <div className="project-card__budget-row" style={{ marginTop: '0', fontSize: '0.85rem' }}>
+                    <span className="project-card__budget-label">Advance</span>
+                    <span className={proj.advanceReceivedAmount >= proj.advanceAmount ? 'text-success' : 'text-warning'}>
+                      ${proj.advanceReceivedAmount.toLocaleString()} / ${proj.advanceAmount.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+
+                <div className="project-card__progress-container">
+                  <div className="project-card__progress-header">
+                    <span>Build Progress</span>
+                    <span>{proj.progress}%</span>
+                  </div>
+                  <div className="project-card__progress-track">
+                    <div
+                      className="project-card__progress-bar"
+                      style={{ width: `${proj.progress}%` }}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -149,6 +192,7 @@ export default function CurrentProjects({ searchQuery = "" }) {
             {searchQuery
               ? `No ongoing projects match "${searchQuery}". Try refining your search query.`
               : "No ongoing projects are available yet."}
+            No active projects match your current view.
           </p>
         </div>
       )}
@@ -181,6 +225,10 @@ export default function CurrentProjects({ searchQuery = "" }) {
           {toastMessage}
         </div>
       )}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .text-success { color: var(--accent); font-weight: 600; }
+        .text-warning { color: #fbbf24; font-weight: 600; }
+      `}} />
     </div>
   );
 }

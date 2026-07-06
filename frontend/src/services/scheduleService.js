@@ -162,6 +162,9 @@ export function markProjectCompleted(projectId) {
   }
 }
 
+  return nextProject;
+}
+
 function toDateInputValue(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");

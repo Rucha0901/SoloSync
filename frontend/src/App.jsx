@@ -112,6 +112,14 @@ export default function App() {
               <Route path="invoices" element={<Invoices />} />
               <Route path="profile" element={<Profile />} />
               <Route path="reminders" element={<Reminders />} />
+              <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
+              <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
+              <Route path="/meet-schedule" element={<MeetSchedule />} />
+              <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
+              <Route path="/payments" element={<PaymentDashboard />} />
+              <Route path="/invoices" element={<Invoices />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/reminders" element={<Reminders />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
         )}
