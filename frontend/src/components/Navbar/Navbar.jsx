@@ -8,7 +8,7 @@ import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import { addMeeting } from "../../services/scheduleService";
 import "./Navbar.css";
 
-export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }) {
+export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange, onNewProjectClick }) {
   const { user } = useAuth();
   const [isAIPopoverOpen, setIsAIPopoverOpen] = useState(false);
   const [isMeetModalOpen, setIsMeetModalOpen] = useState(false);
@@ -227,7 +227,7 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange }
       <button
         type="button"
         className="navbar__new-project-button"
-        onClick={() => alert("New project creation will be implemented in the next phase.")}
+        onClick={onNewProjectClick}
         aria-label="Create new project"
       >
         <svg

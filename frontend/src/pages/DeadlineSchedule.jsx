@@ -1,3 +1,6 @@
+import { useEffect, useMemo, useState } from "react";
+import { CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Flag } from "lucide-react";
+import { PROJECTS_UPDATED_EVENT, getMonthCells, getProjects, isSameDate } from "../services/scheduleService";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Flag, ArrowLeft } from "lucide-react";
@@ -10,6 +13,14 @@ export default function DeadlineSchedule() {
   const navigate = useNavigate();
   const today = new Date();
   const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [projects, setProjects] = useState(() => getProjects());
+
+  useEffect(() => {
+    const refreshProjects = () => setProjects(getProjects());
+
+    window.addEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+    return () => window.removeEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+  }, []);
 
   const monthCells = useMemo(
     () => getMonthCells(cursor.getFullYear(), cursor.getMonth()),
@@ -46,7 +57,7 @@ export default function DeadlineSchedule() {
         </div>
         <div className="schedule-page__summary">
           <ClipboardList size={18} />
-          <span>{ACTIVE_PROJECTS.length} active deadlines</span>
+          <span>{projects.length} active deadlines</span>
         </div>
       </header>
 
@@ -75,7 +86,7 @@ export default function DeadlineSchedule() {
         <div className="schedule-grid">
           {monthCells.map((date, index) => {
             const dayDeadlines = date
-              ? ACTIVE_PROJECTS.filter((project) => isSameDate(project.dueDate, date))
+              ? projects.filter((project) => isSameDate(project.dueDate, date))
               : [];
 
             return (

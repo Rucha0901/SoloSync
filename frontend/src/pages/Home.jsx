@@ -1,14 +1,30 @@
+import { useEffect, useState } from "react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo/Logo";
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../context/ProjectContext";
 import Avatar from "../components/Avatars/Avatars";
+import { PROJECTS_UPDATED_EVENT, getProjects } from "../services/scheduleService";
 import NewProjectModal from "../components/Modals/NewProjectModal";
 import "./Home.css";
 
-export default function Home() {
+export default function Home({ onNewProjectClick }) {
   const { user } = useAuth();
+  const [projects, setProjects] = useState(() => getProjects());
+
+  useEffect(() => {
+    const refreshProjects = () => setProjects(getProjects());
+
+    window.addEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+    return () => window.removeEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+  }, []);
+
+  const stats = [
+    { label: "Active Projects", value: String(projects.length), change: "+1 this week", path: "/current-projects", type: "success" },
+    { label: "Pending Invoices", value: "2", change: "$2,400 outstanding", path: "/invoices", type: "warning" },
+    { label: "Payments (MTD)", value: "$6,850", change: "+18% vs last month", path: "/payments", type: "info" },
+    { label: "Closed Projects", value: "14", change: "Completed this year", path: "/closed-projects", type: "neutral" },
   const { projects } = useProjects();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -90,6 +106,7 @@ export default function Home() {
           <h2 className="home-dashboard__section-title">Quick Actions</h2>
           <div className="home-dashboard__shortcuts-grid">
             <button
+              onClick={onNewProjectClick}
               onClick={() => setIsModalOpen(true)}
               className="home-dashboard__shortcut-btn home-dashboard__shortcut-btn--primary"
             >

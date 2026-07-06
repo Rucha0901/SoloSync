@@ -15,14 +15,18 @@ import MeetSchedule from "./pages/MeetSchedule";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Reminders from "./pages/Reminders";
+import NewProjectModal from "./components/NewProjectModal/NewProjectModal";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import { registerReminders, alreadyRegisteredThisSession } from "./services/ReminderService";
+import { addProject } from "./services/scheduleService";
 import "./App.css";
 
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const { user } = useAuth();
   const location = useLocation();
 
@@ -33,6 +37,21 @@ export default function App() {
       registerReminders(user.email);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!successMessage) {
+      return undefined;
+    }
+
+    const timeout = window.setTimeout(() => setSuccessMessage(""), 3500);
+    return () => window.clearTimeout(timeout);
+  }, [successMessage]);
+
+  const handleCreateProject = (project) => {
+    const createdProject = addProject(project);
+    setIsProjectModalOpen(false);
+    setSuccessMessage(`${createdProject.name} was created successfully.`);
+  };
 
   // Redirect authenticated users trying to access login/signup
   const PublicRoute = ({ children }) => {
@@ -46,10 +65,23 @@ export default function App() {
           onMenuClick={() => setIsSidebarOpen(true)}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          onNewProjectClick={() => setIsProjectModalOpen(true)}
         />
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
+        {successMessage && (
+          <div className="app__success-toast" role="status">
+            {successMessage}
+          </div>
+        )}
+
         <main className="app__content">{children}</main>
+
+        <NewProjectModal
+          isOpen={isProjectModalOpen}
+          onClose={() => setIsProjectModalOpen(false)}
+          onCreate={handleCreateProject}
+        />
       </div>
     </ProtectedRoute>
   );
@@ -69,7 +101,7 @@ export default function App() {
         path="/dashboard/*"
         element={renderAppShell(
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Home onNewProjectClick={() => setIsProjectModalOpen(true)} />} />
               <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
               <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
               <Route path="/meet-schedule" element={<MeetSchedule />} />
