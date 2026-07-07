@@ -11,6 +11,8 @@ func New(emailHandler *handlers.EmailHandler, reminderHandler *handlers.Reminder
 
 	// Email routes
 	mux.HandleFunc("POST /api/email/send", emailHandler.SendEmail)
+	mux.HandleFunc("POST /api/email/welcome-client", emailHandler.SendWelcomeEmail)
+	mux.HandleFunc("POST /api/email/thank-you-client", emailHandler.SendThankYouEmail)
 
 	// Reminder routes
 	mux.HandleFunc("POST /api/reminders/register", reminderHandler.Register)

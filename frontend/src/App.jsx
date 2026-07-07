@@ -51,6 +51,29 @@ export default function App() {
     const createdProject = addProject(project);
     setIsProjectModalOpen(false);
     setSuccessMessage(`${createdProject.name} was created successfully.`);
+
+    // Send Welcome Email to client if clientEmail exists
+    if (createdProject.clientEmail) {
+      fetch("http://localhost:8080/api/email/welcome-client", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientEmail: createdProject.clientEmail,
+          clientName: createdProject.client,
+          projectName: createdProject.name,
+          freelancerName: user ? user.username : "",
+          freelancerEmail: user ? user.email : "",
+          dueDate: new Date(`${createdProject.dueDate}T00:00`).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric"
+          }),
+          budget: Number(createdProject.totalBudget) || 0
+        })
+      }).then(res => res.json())
+        .then(data => console.log("[App] Welcome email response:", data))
+        .catch(err => console.error("[App] Failed to send welcome email:", err));
+    }
   };
 
   // Redirect authenticated users trying to access login/signup
@@ -75,7 +98,10 @@ export default function App() {
           </div>
         )}
 
-        <main className="app__content">{children}</main>
+        <div className="app__body">
+          <main className="app__content">{children}</main>
+          <UpcomingMeetPanel />
+        </div>
 
         <NewProjectModal
           isOpen={isProjectModalOpen}
@@ -102,72 +128,19 @@ export default function App() {
       <Route
         path="/dashboard/*"
         element={renderAppShell(
-            <Routes>
-              <Route path="/" element={<Home onNewProjectClick={() => setIsProjectModalOpen(true)} />} />
-              <Route path="current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
-              <Route path="closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
-              <Route path="meet-schedule" element={<MeetSchedule />} />
-              <Route path="deadline-schedule" element={<DeadlineSchedule />} />
-              <Route path="payments" element={<PaymentDashboard />} />
-              <Route path="invoices" element={<Invoices />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="reminders" element={<Reminders />} />
-              <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
-              <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
-              <Route path="/meet-schedule" element={<MeetSchedule />} />
-              <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
-              <Route path="/payments" element={<PaymentDashboard />} />
-              <Route path="/invoices" element={<Invoices />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/reminders" element={<Reminders />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
+          <Routes>
+            <Route path="/" element={<Home onNewProjectClick={() => setIsProjectModalOpen(true)} />} />
+            <Route path="current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
+            <Route path="closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
+            <Route path="meet-schedule" element={<MeetSchedule />} />
+            <Route path="deadline-schedule" element={<DeadlineSchedule />} />
+            <Route path="payments" element={<PaymentDashboard />} />
+            <Route path="invoices" element={<Invoices />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="reminders" element={<Reminders />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
         )}
-        element={
-          <ProtectedRoute>
-            <div className="app">
-              <Navbar
-                onMenuClick={() => setIsSidebarOpen(true)}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-              />
-              <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-              <div className="app__body">
-                <main className="app__content">
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
-                    <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
-                    <Route path="/meet-schedule" element={<MeetSchedule />} />
-                    <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
-                    <Route path="/payments" element={<Payments />} />
-                    <Route path="/invoices" element={<Invoices />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/reminders" element={<Reminders />} />
-                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                  </Routes>
-                </main>
-                <UpcomingMeetPanel />
-              </div>
-              <main className="app__content">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/current-projects" element={<CurrentProjects searchQuery={searchQuery} />} />
-                  <Route path="/closed-projects" element={<ClosedProjects searchQuery={searchQuery} />} />
-                  <Route path="/meet-schedule" element={<MeetSchedule />} />
-                  <Route path="/deadline-schedule" element={<DeadlineSchedule />} />
-                  <Route path="/payments" element={<Payments />} />
-                  <Route path="/invoices" element={<Invoices />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/reminders" element={<Reminders />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                </Routes>
-              </main>
-            </div>
-          </ProtectedRoute>
-        }
       />
 
       {/* Fallback */}

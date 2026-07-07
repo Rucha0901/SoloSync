@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Flag } from "lucide-react";
-import { PROJECTS_UPDATED_EVENT, getMonthCells, getProjects, isSameDate } from "../services/scheduleService";
-import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Flag, ArrowLeft } from "lucide-react";
-import { ACTIVE_PROJECTS, getMonthCells, isSameDate } from "../services/scheduleService";
+import { PROJECTS_UPDATED_EVENT, getMonthCells, getProjects, isSameDate } from "../services/scheduleService";
 import "./Schedule.css";
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

@@ -1,63 +1,130 @@
-import { useEffect, useState } from "react";
-import React, { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import Logo from "../components/Logo/Logo";
 import { useAuth } from "../context/AuthContext";
-import { useProjects } from "../context/ProjectContext";
 import Avatar from "../components/Avatars/Avatars";
 import { PROJECTS_UPDATED_EVENT, getProjects } from "../services/scheduleService";
-import NewProjectModal from "../components/Modals/NewProjectModal";
+import { getPaymentProjects, calculatePaymentSummary, PAYMENT_UPDATED_EVENT } from "../services/paymentService";
 import "./Home.css";
 
 export default function Home({ onNewProjectClick }) {
   const { user } = useAuth();
   const [projects, setProjects] = useState(() => getProjects());
+  const [paymentProjects, setPaymentProjects] = useState(() => getPaymentProjects());
 
   useEffect(() => {
-    const refreshProjects = () => setProjects(getProjects());
+    const refreshProjects = () => {
+      setProjects(getProjects());
+      setPaymentProjects(getPaymentProjects());
+    };
 
     window.addEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
-    return () => window.removeEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+    window.addEventListener(PAYMENT_UPDATED_EVENT, refreshProjects);
+    return () => {
+      window.removeEventListener(PROJECTS_UPDATED_EVENT, refreshProjects);
+      window.removeEventListener(PAYMENT_UPDATED_EVENT, refreshProjects);
+    };
   }, []);
 
-  const stats = [
-    { label: "Active Projects", value: String(projects.length), change: "+1 this week", path: "/current-projects", type: "success" },
-    { label: "Pending Invoices", value: "2", change: "$2,400 outstanding", path: "/invoices", type: "warning" },
-    { label: "Payments (MTD)", value: "$6,850", change: "+18% vs last month", path: "/payments", type: "info" },
-    { label: "Closed Projects", value: "14", change: "Completed this year", path: "/closed-projects", type: "neutral" },
-  const { projects } = useProjects();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const activeProjectsCount = useMemo(() => {
+    return projects.filter(p => p.status !== "Completed" && p.status !== "Closed").length;
+  }, [projects]);
 
-  const activeProjectsCount = projects.length;
-  const pendingPayments = projects.reduce((total, p) => total + (p.budget - p.totalPaid), 0);
-  const totalReceived = projects.reduce((total, p) => total + p.totalPaid, 0);
+  const summary = useMemo(() => calculatePaymentSummary(paymentProjects), [paymentProjects]);
 
   const stats = [
-    { label: "Active Projects", value: activeProjectsCount.toString(), change: "+1 this week", path: "/current-projects", type: "success" },
-    { label: "Pipeline Value", value: `$${pendingPayments.toLocaleString()}`, change: "Target revenue", path: "/payments", type: "warning" },
-    { label: "Payments (Total)", value: `$${totalReceived.toLocaleString()}`, change: "Realized revenue", path: "/payments", type: "info" },
-    { label: "Payment Status", value: "Healthy", change: "Across all clients", path: "/payments", type: "neutral" },
+    {
+      label: "Active Projects",
+      value: String(activeProjectsCount),
+      change: "Currently in progress",
+      path: "/dashboard/current-projects",
+      type: "success",
+    },
+    {
+      label: "Pending Payments",
+      value: new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(summary.pendingPayments),
+      change: "Outstanding revenue",
+      path: "/dashboard/payments",
+      type: "warning",
+    },
+    {
+      label: "Completed Payments",
+      value: new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(summary.completedPayments),
+      change: "Realized revenue",
+      path: "/dashboard/payments",
+      type: "info",
+    },
+    {
+      label: "Monthly Income",
+      value: new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(summary.currentMonthIncome),
+      change: "Received this month",
+      path: "/dashboard/payments",
+      type: "neutral",
+    },
   ];
 
-  const recentActivities = projects
-    .flatMap(p => [
-      { id: `create-${p.id}`, type: "project", message: `Started project '${p.name}'`, date: p.id.split('-')[1] },
-      ...p.payments.map(pay => ({ id: pay.id, type: "payment", message: `Received ${pay.type} for '${p.name}'`, date: pay.id.split('-')[1] }))
-    ])
-    .sort((a, b) => b.date - a.date)
-    .slice(0, 5);
+  const recentActivities = useMemo(() => {
+    const activities = [];
+    projects.forEach(p => {
+      if (p.createdAt) {
+        activities.push({
+          id: `create-${p.id}`,
+          type: "project",
+          message: `Started project '${p.name}'`,
+          timestamp: new Date(p.createdAt).getTime(),
+          timeStr: new Date(p.createdAt).toLocaleDateString(),
+        });
+      }
+      if (p.completedDate) {
+        activities.push({
+          id: `complete-${p.id}`,
+          type: "project",
+          message: `Completed project '${p.name}'`,
+          timestamp: new Date(p.completedDate).getTime(),
+          timeStr: new Date(p.completedDate).toLocaleDateString(),
+        });
+      }
+    });
+
+    paymentProjects.forEach(pp => {
+      if (pp.paymentReceived && pp.paymentReceivedAt) {
+        activities.push({
+          id: `pay-received-${pp.id}`,
+          type: "payment",
+          message: `Received final payment for '${pp.name}'`,
+          timestamp: new Date(pp.paymentReceivedAt).getTime(),
+          timeStr: new Date(pp.paymentReceivedAt).toLocaleDateString(),
+        });
+      }
+      if (pp.advancePaid > 0 && pp.advancePaidAt) {
+        activities.push({
+          id: `pay-advance-${pp.id}`,
+          type: "payment",
+          message: `Received advance payment of $${pp.advancePaid.toLocaleString()} for '${pp.name}'`,
+          timestamp: new Date(pp.advancePaidAt).getTime(),
+          timeStr: new Date(pp.advancePaidAt).toLocaleDateString(),
+        });
+      }
+    });
+
+    return activities
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 5);
+  }, [projects, paymentProjects]);
 
   return (
     <div className="home-dashboard">
       <header className="home-dashboard__header">
         <div className="home-dashboard__welcome">
           {user && (
-            <Link to="/profile" className="home-dashboard__avatar-link" aria-label="View profile settings">
+            <Link to="/dashboard/profile" className="home-dashboard__avatar-link" aria-label="View profile settings">
               <Avatar id={user.avatarId} size={56} className="home-dashboard__welcome-avatar" />
             </Link>
           )}
           <div>
-            <h1 className="home-dashboard__title" style={{ marginBottom: 4 }}>Welcome back, {user ? user.username : "Freelancer"}</h1>
+            <h1 className="home-dashboard__title" style={{ marginBottom: 4 }}>
+              Welcome back, {user ? user.username : "Freelancer"}
+            </h1>
             <p className="home-dashboard__subtitle">
               Your command center is ready. You have {activeProjectsCount} active projects.
             </p>
@@ -92,7 +159,7 @@ export default function Home({ onNewProjectClick }) {
                   </div>
                   <div className="home-dashboard__activity-details">
                     <p className="home-dashboard__activity-message">{act.message}</p>
-                    <span className="home-dashboard__activity-time">Automated log</span>
+                    <span className="home-dashboard__activity-time">{act.timeStr}</span>
                   </div>
                 </div>
               ))
@@ -107,23 +174,20 @@ export default function Home({ onNewProjectClick }) {
           <div className="home-dashboard__shortcuts-grid">
             <button
               onClick={onNewProjectClick}
-              onClick={() => setIsModalOpen(true)}
               className="home-dashboard__shortcut-btn home-dashboard__shortcut-btn--primary"
             >
               <span className="home-dashboard__shortcut-icon">+</span>
               Create New Project
             </button>
-            <Link to="/invoices" className="home-dashboard__shortcut-btn">
+            <Link to="/dashboard/invoices" className="home-dashboard__shortcut-btn">
               Create Invoice
             </Link>
-            <Link to="/payments" className="home-dashboard__shortcut-btn">
+            <Link to="/dashboard/payments" className="home-dashboard__shortcut-btn">
               Manage Finances
             </Link>
           </div>
         </div>
       </div>
-
-      <NewProjectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }

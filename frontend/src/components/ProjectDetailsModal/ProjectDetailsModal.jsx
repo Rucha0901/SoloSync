@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { X, Calendar, User, Mail, DollarSign, CheckCircle2, Clock, ShieldAlert } from "lucide-react";
 import { markProjectCompleted } from "../../services/scheduleService";
 import { getPaymentProjects, markPaymentCompleted, PAYMENT_UPDATED_EVENT } from "../../services/paymentService";
+import { useAuth } from "../../context/AuthContext";
 import "./ProjectDetailsModal.css";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
@@ -25,6 +26,7 @@ function formatDate(value) {
 }
 
 export default function ProjectDetailsModal({ isOpen, onClose, project, onActionSuccess }) {
+  const { user } = useAuth();
   const [paymentProjects, setPaymentProjects] = useState(() => getPaymentProjects());
 
   // Listen to payment updates in case payment state changes
@@ -99,7 +101,7 @@ export default function ProjectDetailsModal({ isOpen, onClose, project, onAction
 
   const handleMarkCompleted = () => {
     if (isProjectDone) return;
-    markProjectCompleted(project.id);
+    markProjectCompleted(project.id, user ? user.username : "");
     if (onActionSuccess) {
       onActionSuccess(`Project "${project.name}" has been marked as Completed!`);
     }
