@@ -10,6 +10,7 @@ export const ACTIVE_PROJECTS = [
     id: "proj-1",
     name: "Acme Website Redesign",
     client: "Acme Corp",
+    clientEmail: "acme-client@example.com",
     status: "In Progress",
     statusType: "progress",
     budget: "$4,500",
@@ -20,6 +21,7 @@ export const ACTIVE_PROJECTS = [
     id: "proj-2",
     name: "Mobile App API Integration",
     client: "Stark Industries",
+    clientEmail: "stark-client@example.com",
     status: "In Progress",
     statusType: "progress",
     budget: "$6,200",
@@ -30,6 +32,7 @@ export const ACTIVE_PROJECTS = [
     id: "proj-3",
     name: "Brand Identity & Guidelines",
     client: "Wayne Enterprises",
+    clientEmail: "wayne-client@example.com",
     status: "In Review",
     statusType: "review",
     budget: "$2,800",
@@ -116,18 +119,35 @@ export function addProject(project) {
   return nextProject;
 }
 
-export function markProjectCompleted(projectId) {
+export function markProjectCompleted(projectId, freelancerName) {
   const projects = getProjects();
   const index = projects.findIndex((p) => p.id === projectId);
   if (index !== -1) {
     if (projects[index].status === "Completed") {
       return;
     }
-    projects[index].status = "Completed";
-    projects[index].statusType = "completed";
-    projects[index].progress = 100;
-    projects[index].completedDate = new Date().toISOString().split("T")[0];
+    const proj = projects[index];
+    proj.status = "Completed";
+    proj.statusType = "completed";
+    proj.progress = 100;
+    proj.completedDate = new Date().toISOString().split("T")[0];
     saveProjects(projects);
+
+    // Send thank you email to client if email exists
+    if (proj.clientEmail) {
+      fetch("http://localhost:8080/api/email/thank-you-client", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientEmail: proj.clientEmail,
+          clientName: proj.client,
+          projectName: proj.name,
+          freelancerName: freelancerName || "Your Freelancer"
+        })
+      }).then(res => res.json())
+        .then(data => console.log("[scheduleService] Thank you email response:", data))
+        .catch(err => console.error("[scheduleService] Failed to send thank you email:", err));
+    }
   }
 
   try {

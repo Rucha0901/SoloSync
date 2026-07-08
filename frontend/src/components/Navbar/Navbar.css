@@ -292,12 +292,6 @@
 }
 
 /* Navbar Profile Link */
-.navbar__profile-area {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
 .navbar__profile-link {
   display: inline-flex;
   align-items: center;
@@ -322,75 +316,6 @@
 
 .navbar__profile-avatar {
   border-radius: 50%;
-}
-
-.navbar__next-meet-popover {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  width: 240px;
-  padding: 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background-color: var(--bg-secondary);
-  box-shadow: 0 12px 30px var(--shadow-color);
-  z-index: 45;
-}
-
-.navbar__next-meet-popover::before {
-  content: "";
-  position: absolute;
-  top: -6px;
-  right: 13px;
-  width: 10px;
-  height: 10px;
-  border-top: 1px solid var(--border-color);
-  border-left: 1px solid var(--border-color);
-  background-color: var(--bg-secondary);
-  transform: rotate(45deg);
-}
-
-.navbar__next-meet-heading {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-secondary);
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.navbar__next-meet-countdown {
-  display: block;
-  margin-top: 6px;
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 1.18rem;
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.navbar__next-meet-project,
-.navbar__next-meet-meta,
-.navbar__next-meet-empty {
-  display: block;
-  overflow: hidden;
-  margin-top: 4px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.navbar__next-meet-project {
-  color: var(--text-primary);
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-.navbar__next-meet-meta,
-.navbar__next-meet-empty {
-  color: var(--text-secondary);
-  font-size: 0.74rem;
 }
 
 .navbar__meet-modal-backdrop {
@@ -680,11 +605,6 @@
   .navbar__new-project-button,
   .navbar__ai-container {
     display: none;
-  }
-
-  .navbar__next-meet-popover {
-    right: -4px;
-    width: min(220px, calc(100vw - 24px));
   }
 
   .navbar__meet-form-row {

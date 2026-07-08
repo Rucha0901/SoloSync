@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import React from "react";
 import { PROJECTS_UPDATED_EVENT, getProjects } from "../services/scheduleService";
 import ProjectDetailsModal from "../components/ProjectDetailsModal/ProjectDetailsModal";
 import "./Projects.css";
@@ -107,8 +108,8 @@ export default function CurrentProjects({ searchQuery = "" }) {
                     {proj.client}
                   </span>
                 </div>
-                <span className="project-card__badge project-card__badge--ongoing">
-                  Ongoing
+                <span className={`project-card__badge project-card__badge--${proj.statusType || 'ongoing'}`}>
+                  {proj.status || "Ongoing"}
                 </span>
               </div>
 
@@ -126,6 +127,19 @@ export default function CurrentProjects({ searchQuery = "" }) {
                 <div className="project-card__detail-row">
                   <span className="project-card__detail-label">Advance Payment</span>
                   <span className="project-card__detail-value">{formatAdvance(proj.advance)}</span>
+                </div>
+
+                <div className="project-card__progress-container">
+                  <div className="project-card__progress-header">
+                    <span>Build Progress</span>
+                    <span>{proj.progress}%</span>
+                  </div>
+                  <div className="project-card__progress-track">
+                    <div
+                      className="project-card__progress-bar"
+                      style={{ width: `${proj.progress}%` }}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -149,6 +163,7 @@ export default function CurrentProjects({ searchQuery = "" }) {
             {searchQuery
               ? `No ongoing projects match "${searchQuery}". Try refining your search query.`
               : "No ongoing projects are available yet."}
+            No active projects match your current view.
           </p>
         </div>
       )}
@@ -181,6 +196,10 @@ export default function CurrentProjects({ searchQuery = "" }) {
           {toastMessage}
         </div>
       )}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .text-success { color: var(--accent); font-weight: 600; }
+        .text-warning { color: #fbbf24; font-weight: 600; }
+      `}} />
     </div>
   );
 }
