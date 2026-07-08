@@ -4,40 +4,48 @@ import (
 	"net/http"
 
 	"freelanceflow/internal/handlers"
+
+	"github.com/gin-gonic/gin"
 )
 
-func New(emailHandler *handlers.EmailHandler, reminderHandler *handlers.ReminderHandler) http.Handler {
-	mux := http.NewServeMux()
+func New(emailHandler *handlers.EmailHandler, reminderHandler *handlers.ReminderHandler, calendarHandler *handlers.CalendarHandler) http.Handler {
+	r := gin.New()
+	r.Use(gin.Logger(), gin.Recovery(), corsMiddleware())
 
 	// Email routes
-	mux.HandleFunc("POST /api/email/send", emailHandler.SendEmail)
+	r.POST("/api/email/send", gin.WrapF(emailHandler.SendEmail))
 
 	// Reminder routes
-	mux.HandleFunc("POST /api/reminders/register", reminderHandler.Register)
-	mux.HandleFunc("POST /api/reminders/trigger-now", reminderHandler.TriggerNow)
+	r.POST("/api/reminders/register", gin.WrapF(reminderHandler.Register))
+	r.POST("/api/reminders/trigger-now", gin.WrapF(reminderHandler.TriggerNow))
+
+	// Google Calendar routes
+	r.GET("/auth/google", calendarHandler.AuthGoogle)
+	r.GET("/auth/google/callback", calendarHandler.AuthGoogleCallback)
+	r.GET("/calendar/status", calendarHandler.Status)
+	r.POST("/calendar/create-event", calendarHandler.CreateEvent)
 
 	// Health
-	mux.HandleFunc("GET /api/health", healthCheck)
+	r.GET("/api/health", healthCheck)
 
-	return withCORS(mux)
+	return r
 }
 
-func healthCheck(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"status":"ok"}`))
+func healthCheck(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 
-func withCORS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Content-Type")
 
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusNoContent)
+		if c.Request.Method == http.MethodOptions {
+			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
 
-		next.ServeHTTP(w, r)
-	})
+		c.Next()
+	}
 }

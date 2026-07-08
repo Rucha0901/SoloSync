@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"freelanceflow/internal/calendar"
 	"freelanceflow/internal/config"
 	"freelanceflow/internal/email"
 	"freelanceflow/internal/handlers"
@@ -20,6 +21,9 @@ func main() {
 	if err := cfg.ValidateSMTP(); err != nil {
 		log.Fatalf("configuration error: %v", err)
 	}
+	if err := cfg.ValidateGoogle(); err != nil {
+		log.Fatalf("configuration error: %v", err)
+	}
 
 	// Email service (SMTP)
 	emailService := email.NewSMTPService(cfg.SMTP)
@@ -31,7 +35,19 @@ func main() {
 	scheduler.Start()
 	reminderHandler := handlers.NewReminderHandler(scheduler)
 
-	r := router.New(emailHandler, reminderHandler)
+	calendarStore, err := calendar.NewStore(cfg.Database.Path)
+	if err != nil {
+		log.Fatalf("calendar database error: %v", err)
+	}
+	defer calendarStore.Close()
+
+	calendarService, err := calendar.NewService(calendarStore, cfg.Google)
+	if err != nil {
+		log.Fatalf("calendar configuration error: %v", err)
+	}
+	calendarHandler := handlers.NewCalendarHandler(calendarService)
+
+	r := router.New(emailHandler, reminderHandler, calendarHandler)
 
 	addr := ":" + cfg.ServerPort
 	log.Printf("SoloSync backend listening on %s", addr)
