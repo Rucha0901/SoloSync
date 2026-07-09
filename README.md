@@ -1,20 +1,14 @@
-<<<<<<< HEAD
-# FreelanceFlow
+# SoloSync
 
-An open-source dashboard for freelancers to organize and manage their work.
-This is the foundational stage of the project: navigation shell, theming, and
-a modular SMTP email service on the backend. No business logic, auth, or
-database has been implemented yet by design.
+A freelancer management dashboard that centralizes projects, payments, invoices, reminders, and meeting schedules in one place.
 
 ## Structure
 
+```text
+SoloSync/
+├── frontend/    React dashboard shell
+└── backend/     Go backend for email reminders and Google Calendar
 ```
-freelanceflow/
-├── frontend/    React dashboard shell (navigation, theming, routing)
-└── backend/     Go SMTP email service
-```
-
-See `frontend/README.md` and `backend/README.md` for details specific to each.
 
 ## Quick Start
 
@@ -22,45 +16,32 @@ See `frontend/README.md` and `backend/README.md` for details specific to each.
 
 ```bash
 cd backend
-cp .env.example .env   # fill in real SMTP credentials
-export $(grep -v '^#' .env | xargs)
+cp .env.example .env
+go mod download
 go run ./cmd/server
 ```
 
-Runs on `http://localhost:8080` by default.
+Required Google OAuth variables:
+
+```bash
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URL=http://localhost:8080/auth/google/callback
+```
 
 ### Frontend
 
 ```bash
 cd frontend
 npm install
+cp .env.example .env
 npm run dev
 ```
 
-Runs on `http://localhost:5173` by default.
+## Google Calendar
 
-## What's Implemented
-
-**Frontend**
-- GitHub-style hamburger menu that opens a slide-out sidebar with smooth
-  open/close animation, closes on outside click or Escape
-- Sidebar links: Current Projects, Closed Projects, Payments, Invoices —
-  each routed to its own placeholder page
-- Light/dark theme toggle, persisted to `localStorage`, applied across the
-  entire UI via CSS variables
-
-**Backend**
-- `POST /api/email/send` — sends an email through SMTP
-- `GET /api/health` — basic health check
-- SMTP credentials are read from environment variables only, never hardcoded
-- Email sending logic lives behind a `Service` interface so it can be reused
-  by future automation features without changes to calling code
-
-## What's Intentionally Not Implemented Yet
-
-Authentication, a database, payment processing, project management logic,
-and automation workflows are out of scope for this stage.
-=======
-# SoloSync
-A freelancer management dashboard that centralizes projects, payments, and invoices in one place. Built with React and Go, featuring a GitHub-inspired sidebar and automation to streamline freelance workflows.
->>>>>>> fee16f8e0693a30770fa804c685d625c536ebaef
+- Connect from `Dashboard -> Profile -> Google Calendar`.
+- Add a meeting from the navbar and enable `Add to Google Calendar`.
+- The backend stores Google `access_token`, `refresh_token`, and token expiry in SQLite.
+- Expired Google tokens are refreshed automatically before event creation.
+- Created events include a popup reminder.

@@ -5,6 +5,19 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Avatar from "../Avatars/Avatars";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
+import {
+  SCHEDULE_UPDATED_EVENT,
+  addMeeting,
+  formatDateLabel,
+  formatMeetingTime,
+  getMeetingDateTime,
+  getMeetings,
+  getUpcomingMeetings,
+} from "../../services/scheduleService";
+import {
+  createGoogleCalendarEvent,
+  getGoogleCalendarStatus,
+} from "../../services/calendarService";
 import { addMeeting } from "../../services/scheduleService";
 import "./Navbar.css";
 
@@ -16,7 +29,11 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange, 
     projectName: "",
     date: "",
     time: "",
+    addToGoogleCalendar: false,
   });
+  const [calendarConnected, setCalendarConnected] = useState(false);
+  const [meetError, setMeetError] = useState("");
+  const [isCreatingMeet, setIsCreatingMeet] = useState(false);
   const popoverRef = useRef(null);
   const searchInputRef = useRef(null);
 
@@ -37,6 +54,47 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange, 
   }, []);
 
   useEffect(() => {
+    if (!isMeetModalOpen || !user?.email) {
+      return undefined;
+    }
+
+    let isMounted = true;
+    getGoogleCalendarStatus(user.email)
+      .then((status) => {
+        if (isMounted) {
+          setCalendarConnected(Boolean(status.connected));
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setCalendarConnected(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isMeetModalOpen, user?.email]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    function refreshMeetings() {
+      setMeetings(getMeetings());
+    }
+
+    window.addEventListener(SCHEDULE_UPDATED_EVENT, refreshMeetings);
+    window.addEventListener("storage", refreshMeetings);
+    return () => {
+      window.removeEventListener(SCHEDULE_UPDATED_EVENT, refreshMeetings);
+      window.removeEventListener("storage", refreshMeetings);
+    };
+  }, []);
+
+  useEffect(() => {
     function handleClickOutside(event) {
       if (popoverRef.current && !popoverRef.current.contains(event.target)) {
         setIsAIPopoverOpen(false);
@@ -52,16 +110,45 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange, 
   }, [isAIPopoverOpen]);
 
   const handleMeetFormChange = (event) => {
-    const { name, value } = event.target;
-    setMeetForm((current) => ({ ...current, [name]: value }));
+    const { name, type, checked, value } = event.target;
+    setMeetForm((current) => ({ ...current, [name]: type === "checkbox" ? checked : value }));
+    setMeetError("");
   };
 
-  const handleAddMeet = (event) => {
+  const handleAddMeet = async (event) => {
     event.preventDefault();
     if (!meetForm.projectName.trim() || !meetForm.date || !meetForm.time) {
       return;
     }
+    if (meetForm.addToGoogleCalendar && !calendarConnected) {
+      setMeetError("Connect Google Calendar from Profile before adding events.");
+      return;
+    }
 
+    setIsCreatingMeet(true);
+
+    const meeting = {
+      projectName: meetForm.projectName.trim(),
+      date: meetForm.date,
+      time: meetForm.time,
+    };
+
+    try {
+      const nextMeetings = addMeeting(meeting);
+      setMeetings(nextMeetings);
+
+      if (meetForm.addToGoogleCalendar) {
+        await createGoogleCalendarEvent(meeting, user.email);
+      }
+
+      setMeetForm({ projectName: "", date: "", time: "", addToGoogleCalendar: false });
+      setMeetError("");
+      setIsMeetModalOpen(false);
+    } catch (error) {
+      setMeetError(error.message || "Could not add this meeting to Google Calendar.");
+    } finally {
+      setIsCreatingMeet(false);
+    }
     addMeeting({
       projectName: meetForm.projectName.trim(),
       date: meetForm.date,
@@ -373,9 +460,28 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange, 
                 </label>
               </div>
 
-              <button type="submit" className="navbar__meet-submit">
+              <label className="navbar__meet-calendar-checkbox">
+                <input
+                  type="checkbox"
+                  name="addToGoogleCalendar"
+                  checked={meetForm.addToGoogleCalendar}
+                  onChange={handleMeetFormChange}
+                  disabled={!calendarConnected}
+                />
+                <span>Add to Google Calendar</span>
+              </label>
+
+              {!calendarConnected && (
+                <p className="navbar__meet-calendar-note">
+                  Connect Google Calendar from Profile to enable this option.
+                </p>
+              )}
+
+              {meetError && <p className="navbar__meet-error">{meetError}</p>}
+
+              <button type="submit" className="navbar__meet-submit" disabled={isCreatingMeet}>
                 <Plus size={16} />
-                Add Meet to Schedule
+                {isCreatingMeet ? "Adding Meet" : "Add Meet to Schedule"}
               </button>
             </form>
           </section>

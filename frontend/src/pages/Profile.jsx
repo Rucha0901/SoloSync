@@ -2,11 +2,17 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Avatar, { AVATARS } from "../components/Avatars/Avatars";
+import {
+  connectGoogleCalendar,
+  getGoogleCalendarStatus,
+} from "../services/calendarService";
 import "./Profile.css";
 
 export default function Profile() {
   const { user, updateAvatar } = useAuth();
   const [successMessage, setSuccessMessage] = useState("");
+  const [calendarStatus, setCalendarStatus] = useState("loading");
+  const [calendarError, setCalendarError] = useState("");
 
   useEffect(() => {
     if (successMessage) {
@@ -17,6 +23,32 @@ export default function Profile() {
     }
   }, [successMessage]);
 
+  useEffect(() => {
+    if (!user?.email) {
+      return undefined;
+    }
+
+    let isMounted = true;
+    setCalendarStatus("loading");
+    getGoogleCalendarStatus(user.email)
+      .then((status) => {
+        if (isMounted) {
+          setCalendarStatus(status.connected ? "connected" : "disconnected");
+          setCalendarError("");
+        }
+      })
+      .catch((error) => {
+        if (isMounted) {
+          setCalendarStatus("disconnected");
+          setCalendarError(error.message);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.email]);
+
   if (!user) return null;
 
   const handleAvatarSelect = (avatarId) => {
@@ -24,6 +56,10 @@ export default function Profile() {
     if (result.success) {
       setSuccessMessage("Profile icon updated successfully.");
     }
+  };
+
+  const handleConnectCalendar = () => {
+    connectGoogleCalendar(user.email);
   };
 
   return (
@@ -85,6 +121,34 @@ export default function Profile() {
                 <Avatar id={avatar.id} size={48} />
               </button>
             ))}
+          </div>
+        </section>
+
+        <section className="profile-card__calendar-section">
+          <div>
+            <h2 className="profile-card__section-title">Google Calendar</h2>
+            <p className="profile-card__section-subtitle">
+              {calendarStatus === "connected"
+                ? "Connected for meeting event creation."
+                : "Connect your calendar to send new meetings to Google Calendar."}
+            </p>
+            {calendarError && <p className="profile-card__calendar-error">{calendarError}</p>}
+          </div>
+          <div className="profile-card__calendar-actions">
+            <span className={`profile-card__calendar-status profile-card__calendar-status--${calendarStatus}`}>
+              {calendarStatus === "loading"
+                ? "Checking"
+                : calendarStatus === "connected"
+                  ? "Connected"
+                  : "Not connected"}
+            </span>
+            <button
+              type="button"
+              className="profile-card__calendar-button"
+              onClick={handleConnectCalendar}
+            >
+              {calendarStatus === "connected" ? "Reconnect Google Calendar" : "Connect Google Calendar"}
+            </button>
           </div>
         </section>
       </div>
