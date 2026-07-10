@@ -18,7 +18,6 @@ import {
   createGoogleCalendarEvent,
   getGoogleCalendarStatus,
 } from "../../services/calendarService";
-import { addMeeting } from "../../services/scheduleService";
 import "./Navbar.css";
 
 export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange, onNewProjectClick }) {
@@ -149,13 +148,6 @@ export default function Navbar({ onMenuClick, searchQuery = "", onSearchChange, 
     } finally {
       setIsCreatingMeet(false);
     }
-    addMeeting({
-      projectName: meetForm.projectName.trim(),
-      date: meetForm.date,
-      time: meetForm.time,
-    });
-    setMeetForm({ projectName: "", date: "", time: "" });
-    setIsMeetModalOpen(false);
   };
 
   const aiTools = [
