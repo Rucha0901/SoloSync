@@ -120,6 +120,17 @@ Edit the `.env` file:
 # 3. Add http://localhost:5173 to Authorized JavaScript origins
 VITE_GOOGLE_CLIENT_ID=your-google-oauth-client-id-here
 ```
+# SoloSync
+
+A freelancer management dashboard that centralizes projects, payments, invoices, reminders, and meeting schedules in one place.
+
+## Structure
+
+```text
+SoloSync/
+├── frontend/    React dashboard shell
+└── backend/     Go backend for email reminders and Google Calendar
+```
 
 ---
 
@@ -132,15 +143,28 @@ cd backend
 # Load environment variables into shell
 export $(grep -v '^#' .env | xargs)
 # Start the server
+cp .env.example .env
+go mod download
 go run ./cmd/server
 ```
 The server will run on `http://localhost:8080`.
 
 ### Start the Frontend (Vite)
 Open a separate terminal window and run:
+Required Google OAuth variables:
+
+```bash
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URL=http://localhost:8080/auth/google/callback
+```
+
+### Frontend
+
 ```bash
 cd frontend
 npm install
+cp .env.example .env
 npm run dev
 ```
 The frontend will start and be accessible at `http://localhost:5173`.
@@ -167,3 +191,11 @@ To verify SMTP integration:
 3. Open `http://localhost:5173` and log in or create an account.
 4. Go to **Reminders** in the sidebar.
 5. Click **Trigger Now**. If your project has a due date 1, 3, or 5 days in the future, you will receive a beautifully formatted email alert at your freelancer email address.
+
+## Google Calendar
+
+- Connect from `Dashboard -> Profile -> Google Calendar`.
+- Add a meeting from the navbar and enable `Add to Google Calendar`.
+- The backend stores Google `access_token`, `refresh_token`, and token expiry in SQLite.
+- Expired Google tokens are refreshed automatically before event creation.
+- Created events include a popup reminder.

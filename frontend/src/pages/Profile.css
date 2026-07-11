@@ -210,3 +210,71 @@
   background-color: var(--bg-hover);
   box-shadow: 0 0 0 1px var(--avatar-color), 0 4px 16px rgba(0, 0, 0, 0.1);
 }
+
+.profile-card__calendar-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border-color);
+}
+
+.profile-card__calendar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.profile-card__calendar-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.profile-card__calendar-status--connected {
+  border-color: rgba(16, 185, 129, 0.35);
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--accent);
+}
+
+.profile-card__calendar-button {
+  min-height: 38px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background-color: var(--accent);
+  color: var(--bg-secondary);
+  padding: 0 14px;
+  font-weight: 700;
+}
+
+.profile-card__calendar-error {
+  margin: -8px 0 0;
+  color: #ef4444;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 640px) {
+  .profile-card__calendar-section {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-card__calendar-actions,
+  .profile-card__calendar-button {
+    width: 100%;
+  }
+
+  .profile-card__calendar-button {
+    justify-content: center;
+  }
+}
