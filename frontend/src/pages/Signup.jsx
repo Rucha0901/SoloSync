@@ -26,7 +26,7 @@ export default function Signup() {
       setIsSubmitting(false);
 
       if (result.success) {
-        navigate("/");
+        navigate("/dashboard");
       } else {
         setError(result.error);
       }
